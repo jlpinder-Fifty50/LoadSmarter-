@@ -65,9 +65,7 @@ const css = `
     font-size: 16px;
   }
 
-  .logo-text {
-    line-height: 1;
-  }
+  .logo-text { line-height: 1; }
 
   .logo-text .name {
     font-family: var(--display);
@@ -130,14 +128,13 @@ const css = `
   }
 
   .panel.active { border-color: var(--border2); }
-  .panel.done { border-color: rgba(34,197,94,0.2); }
+  .panel.done   { border-color: rgba(34,197,94,0.2); }
 
   .panel-header {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 18px 22px;
-    cursor: default;
     border-bottom: 1px solid var(--border);
   }
 
@@ -185,9 +182,7 @@ const css = `
     margin-top: 1px;
   }
 
-  .panel-body {
-    padding: 22px;
-  }
+  .panel-body { padding: 22px; }
 
   /* ─── UPLOAD ─── */
   .drop-zone {
@@ -229,11 +224,70 @@ const css = `
     letter-spacing: 0.08em;
   }
 
+  /* ─── SCREENSHOT COUNTER BAR ─── */
+  .screenshot-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    margin-bottom: 10px;
+  }
+
+  .screenshot-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+
+  .screenshot-count.warn  { color: var(--amber); }
+  .screenshot-count.limit { color: var(--red); }
+
+  .count-track {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    margin-top: 5px;
+  }
+
+  .count-pip {
+    width: 10px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border2);
+    transition: background 0.15s;
+  }
+
+  .count-pip.filled       { background: var(--amber); }
+  .count-pip.filled.warn  { background: var(--orange); }
+  .count-pip.filled.limit { background: var(--red); }
+
+  .add-more-btn {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 6px;
+    color: var(--amber);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .add-more-btn:hover {
+    background: rgba(245,158,11,0.15);
+    border-color: rgba(245,158,11,0.4);
+  }
+
+  /* ─── THUMBNAILS ─── */
   .thumb-row {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 16px;
   }
 
   .thumb {
@@ -249,6 +303,19 @@ const css = `
     height: 64px;
     object-fit: cover;
     display: block;
+  }
+
+  .thumb-num {
+    position: absolute;
+    bottom: 3px;
+    left: 4px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: rgba(255,255,255,0.6);
+    background: rgba(0,0,0,0.5);
+    padding: 1px 4px;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
   }
 
   .thumb .del {
@@ -284,9 +351,9 @@ const css = `
 
   .log-line::before { content: '> '; color: var(--amber); }
   .log-line { color: #4ADE80; display: block; }
-  .log-line.dim { color: #1E4A30; }
+  .log-line.dim  { color: #1E4A30; }
   .log-line.warn { color: var(--amber); }
-  .log-line.err { color: var(--red); }
+  .log-line.err  { color: var(--red); }
 
   .cursor {
     display: inline-block;
@@ -311,7 +378,7 @@ const css = `
     font-family: var(--mono);
   }
 
-  /* ─── BUTTON ─── */
+  /* ─── BUTTONS ─── */
   .btn {
     width: 100%;
     padding: 14px;
@@ -353,10 +420,7 @@ const css = `
     font-size: 17px;
   }
 
-  .btn-secondary:hover:not(:disabled) {
-    background: rgba(245,158,11,0.15);
-  }
-
+  .btn-secondary:hover:not(:disabled) { background: rgba(245,158,11,0.15); }
   .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
 
   /* ─── SPINNER ─── */
@@ -406,10 +470,10 @@ const css = `
     letter-spacing: 0.06em;
   }
 
-  .tag-drive { background: rgba(234,88,12,0.12); color: #FB923C; border: 1px solid rgba(234,88,12,0.2); }
-  .tag-duty  { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
-  .tag-off   { background: rgba(90,112,144,0.1); color: var(--muted); border: 1px solid rgba(90,112,144,0.15); }
-  .tag-sleep { background: rgba(99,102,241,0.1); color: #A5B4FC; border: 1px solid rgba(99,102,241,0.2); }
+  .tag-drive { background: rgba(234,88,12,0.12);  color: #FB923C; border: 1px solid rgba(234,88,12,0.2); }
+  .tag-duty  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+  .tag-off   { background: rgba(90,112,144,0.1);  color: var(--muted); border: 1px solid rgba(90,112,144,0.15); }
+  .tag-sleep { background: rgba(99,102,241,0.1);  color: #A5B4FC; border: 1px solid rgba(99,102,241,0.2); }
 
   /* ─── TOTALS STRIP ─── */
   .totals-strip {
@@ -485,7 +549,6 @@ const css = `
   }
 
   .field select option { background: #0E1318; }
-
   .field.full { grid-column: 1 / -1; }
 
   /* ─── RESULTS ─── */
@@ -531,9 +594,9 @@ const css = `
     text-transform: uppercase;
   }
 
-  .v-match   { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
-  .v-under   { background: rgba(239,68,68,0.1);   color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
-  .v-over    { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+  .v-match { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+  .v-under { background: rgba(239,68,68,0.1);   color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
+  .v-over  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
 
   .compare-grid {
     display: grid;
@@ -544,7 +607,7 @@ const css = `
   @media (max-width: 520px) { .compare-grid { grid-template-columns: 1fr; } }
 
   .cg-cell {
-    padding: 22px 22px;
+    padding: 22px;
     border-right: 1px solid var(--border);
   }
 
@@ -567,8 +630,8 @@ const css = `
     color: var(--text);
   }
 
-  .cg-val.pos { color: var(--green); }
-  .cg-val.neg { color: var(--red); }
+  .cg-val.pos  { color: var(--green); }
+  .cg-val.neg  { color: var(--red); }
   .cg-val.warn { color: var(--amber); }
 
   .cg-sub {
@@ -578,7 +641,6 @@ const css = `
     margin-top: 5px;
   }
 
-  /* Pay row */
   .pay-compare {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -613,7 +675,6 @@ const css = `
   .pc-val.pos { color: var(--green); }
   .pc-val.neg { color: var(--red); }
 
-  /* Analysis */
   .analysis {
     padding: 18px 22px;
     font-size: 15px;
@@ -622,12 +683,11 @@ const css = `
     border-bottom: 1px solid var(--border);
   }
 
-  .analysis strong { color: var(--text); }
-  .analysis .highlight-text { color: var(--amber); font-weight: 600; }
-  .analysis .danger-text { color: var(--red); font-weight: 600; }
-  .analysis .good-text { color: var(--green); font-weight: 600; }
+  .analysis strong            { color: var(--text); }
+  .analysis .highlight-text   { color: var(--amber); font-weight: 600; }
+  .analysis .danger-text      { color: var(--red);   font-weight: 600; }
+  .analysis .good-text        { color: var(--green); font-weight: 600; }
 
-  /* Footer note */
   .results-footer {
     padding: 12px 22px;
     display: flex;
@@ -710,8 +770,11 @@ const css = `
   }
 `;
 
-// ─── HELPERS ───────────────────────────────────────────
+// ─── CONSTANTS ─────────────────────────────────────────
+const MAX_SCREENSHOTS = 20;
+const WARN_AT = 15;
 
+// ─── HELPERS ───────────────────────────────────────────
 function toBase64(file) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -737,48 +800,56 @@ function fd(n) {
   return (n >= 0 ? "+" : "") + "$" + Math.abs(n).toFixed(2);
 }
 
-// ─── MAIN COMPONENT ──────────────────────────────────
-
+// ─── MAIN COMPONENT ────────────────────────────────────
 export default function ELDPayChecker() {
   // Step 1 state
-  const [files, setFiles] = useState([]);
+  const [files, setFiles]       = useState([]);
   const [previews, setPreviews] = useState([]);
-  const [over, setOver] = useState(false);
-  const [logs, setLogs] = useState([]);
+  const [over, setOver]         = useState(false);
+  const [logs, setLogs]         = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError] = useState("");
-  const [eldData, setEldData] = useState(null);
+  const [error, setError]       = useState("");
+  const [eldData, setEldData]   = useState(null);
 
   // Step 2 state
-  const [pay, setPay] = useState({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
+  const [pay, setPay]           = useState({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
   const [comparing, setComparing] = useState(false);
 
   // Results
-  const [result, setResult] = useState(null);
+  const [result, setResult]     = useState(null);
 
-  const fileRef = useRef();
-  const logRef = useRef();
+  const fileRef    = useRef();
+  const addMoreRef = useRef();
+  const logRef     = useRef();
 
   const log = (msg, type = "") => {
     setLogs(p => [...p, { msg, type }]);
     setTimeout(() => { if (logRef.current) logRef.current.scrollTop = 9999; }, 50);
   };
 
+  // ── Add files (enforces MAX_SCREENSHOTS cap) ──────────
   const addFiles = useCallback((incoming) => {
     const valid = Array.from(incoming).filter(f => f.type.startsWith("image/"));
     if (!valid.length) return;
-    setFiles(p => [...p, ...valid]);
-    valid.forEach(f => {
-      const url = URL.createObjectURL(f);
-      setPreviews(p => [...p, url]);
+
+    setFiles(prev => {
+      const slots   = MAX_SCREENSHOTS - prev.length;
+      if (slots <= 0) return prev;
+      const allowed = valid.slice(0, slots);
+      // Build preview URLs only for the allowed slice
+      allowed.forEach(f => {
+        setPreviews(p => [...p, URL.createObjectURL(f)]);
+      });
+      return [...prev, ...allowed];
     });
   }, []);
 
   const removeFile = (i) => {
-    setFiles(p => p.filter((_, idx) => idx !== i));
+    setFiles(p    => p.filter((_, idx) => idx !== i));
     setPreviews(p => p.filter((_, idx) => idx !== i));
   };
 
+  // ── Analyze ───────────────────────────────────────────
   const analyzeELD = async () => {
     setAnalyzing(true);
     setLogs([]);
@@ -788,7 +859,7 @@ export default function ELDPayChecker() {
 
     try {
       log("Initializing ELD parser...");
-      log(`${files.length} screenshot(s) queued`, "dim");
+      log(`${files.length} screenshot(s) queued for analysis`, "dim");
       log("Encoding images to base64...", "dim");
 
       const encoded = await Promise.all(files.map(toBase64));
@@ -800,9 +871,9 @@ export default function ELDPayChecker() {
         source: { type: "base64", media_type: files[i].type || "image/jpeg", data: b64 },
       }));
 
-      const systemPrompt = `You are an expert ELD (Electronic Logging Device) data reader. Your job is to extract hours-of-service data from ELD screenshots taken by truck drivers. Return ONLY valid JSON — no prose, no markdown fences, no explanation.`;
+      const systemPrompt = `You are an expert ELD (Electronic Logging Device) data reader. Your job is to extract hours-of-service data from ELD screenshots taken by truck drivers. The user may provide multiple screenshots covering multiple days or a full pay period — treat them all as one continuous log. Return ONLY valid JSON — no prose, no markdown fences, no explanation.`;
 
-      const userPrompt = `Analyze these ELD screenshots and extract all hours-of-service data.
+      const userPrompt = `Analyze ALL of these ELD screenshots together as one continuous log and extract all hours-of-service data.
 
 Return ONLY this JSON structure:
 {
@@ -834,6 +905,7 @@ Rules:
 - All times in decimal hours (1h 30m = 1.5)
 - totalOnDuty = driving + onDutyNotDriving
 - Use 0.0 for anything not visible
+- Combine data across all screenshots — do not duplicate days
 - If data is unclear, still give best estimate and set confidence to low`;
 
       const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -841,7 +913,7 @@ Rules:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
-          max_tokens: 1500,
+          max_tokens: 2000,
           system: systemPrompt,
           messages: [{
             role: "user",
@@ -855,14 +927,14 @@ Rules:
 
       log("Response received. Parsing data...");
 
-      const raw = (data.content || []).map(c => c.text || "").join("\n");
+      const raw    = (data.content || []).map(c => c.text || "").join("\n");
       const parsed = parseJSON(raw);
 
       if (!parsed) {
         log("Could not auto-parse. Showing raw output.", "warn");
         setEldData({ _raw: raw, weeklyTotals: { totalOnDuty: 0 }, days: [] });
       } else {
-        log(`✓ ELD data extracted. Confidence: ${parsed.confidence || "unknown"}`);
+        log(`✓ ELD data extracted — ${parsed.days?.length || 0} day(s) found. Confidence: ${parsed.confidence || "unknown"}`);
         if (parsed.violations) log(`⚠ Violations detected: ${parsed.violations}`, "warn");
         setEldData(parsed);
       }
@@ -874,27 +946,27 @@ Rules:
     }
   };
 
+  // ── Pay comparison ────────────────────────────────────
   const calcComparison = () => {
     setComparing(true);
-    const eldHours = eldData?.weeklyTotals?.totalOnDuty || 0;
+    const eldHours  = eldData?.weeklyTotals?.totalOnDuty || 0;
     const paidHours = parseFloat(pay.hours) || 0;
-    const rate = parseFloat(pay.rate) || 0;
-    const grossPay = parseFloat(pay.gross) || 0;
-
+    const rate      = parseFloat(pay.rate)  || 0;
+    const grossPay  = parseFloat(pay.gross) || 0;
     const hoursDiff = paidHours - eldHours;
 
     let expectedPay = 0;
     if (pay.type === "hourly" && rate > 0) {
       expectedPay = eldHours * rate;
     } else {
-      expectedPay = grossPay; // flat/salary - just compare hours
+      expectedPay = grossPay;
     }
 
     const payDiff = grossPay - expectedPay;
 
     let verdict = "MATCH";
-    if (hoursDiff < -0.5) verdict = "UNDERPAID";
-    else if (hoursDiff > 0.5) verdict = "OVERPAID";
+    if (hoursDiff < -0.5)      verdict = "UNDERPAID";
+    else if (hoursDiff > 0.5)  verdict = "OVERPAID";
 
     setTimeout(() => {
       setResult({ eldHours, paidHours, hoursDiff, rate, grossPay, expectedPay, payDiff, verdict, payType: pay.type });
@@ -909,9 +981,13 @@ Rules:
     setError("");
   };
 
-  const step1Done = !!eldData;
-  const step2Active = step1Done && !result;
-  const canCompare = step1Done && pay.hours && pay.gross;
+  // ── Derived state ─────────────────────────────────────
+  const step1Done   = !!eldData;
+  const canCompare  = step1Done && pay.hours && pay.gross;
+  const atLimit     = files.length >= MAX_SCREENSHOTS;
+  const nearLimit   = files.length >= WARN_AT && !atLimit;
+
+  const countClass  = atLimit ? "limit" : nearLimit ? "warn" : "";
 
   return (
     <>
@@ -948,35 +1024,95 @@ Rules:
               <div className="step-num">{step1Done ? "✓" : "1"}</div>
               <div>
                 <div className="panel-title">UPLOAD ELD SCREENSHOTS</div>
-                <div className="panel-sub">Any ELD brand · Multiple files supported</div>
+                <div className="panel-sub">Any ELD brand · Up to 20 screenshots · Full pay period supported</div>
               </div>
             </div>
             <div className="panel-body">
               {!step1Done && (
                 <>
-                  <div
-                    className={`drop-zone ${over ? "over" : ""}`}
-                    onDragOver={e => { e.preventDefault(); setOver(true); }}
-                    onDragLeave={() => setOver(false)}
-                    onDrop={e => { e.preventDefault(); setOver(false); addFiles(e.dataTransfer.files); }}
-                  >
-                    <input ref={fileRef} type="file" accept="image/*" multiple onChange={e => addFiles(e.target.files)} />
-                    <span className="drop-icon">📱</span>
-                    <div className="drop-title">DROP SCREENSHOTS HERE</div>
-                    <div className="drop-sub">or tap to browse · PNG, JPG, WEBP</div>
-                  </div>
-
-                  {previews.length > 0 && (
-                    <div className="thumb-row">
-                      {previews.map((src, i) => (
-                        <div key={i} className="thumb">
-                          <img src={src} alt={`ELD ${i + 1}`} />
-                          <button className="del" onClick={() => removeFile(i)}>✕</button>
-                        </div>
-                      ))}
+                  {/* Drop zone — only show when under limit */}
+                  {!atLimit && (
+                    <div
+                      className={`drop-zone ${over ? "over" : ""}`}
+                      onDragOver={e  => { e.preventDefault(); setOver(true); }}
+                      onDragLeave={() => setOver(false)}
+                      onDrop={e      => { e.preventDefault(); setOver(false); addFiles(e.dataTransfer.files); }}
+                    >
+                      <input
+                        ref={fileRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={e => addFiles(e.target.files)}
+                      />
+                      <span className="drop-icon">📱</span>
+                      <div className="drop-title">
+                        {files.length === 0 ? "DROP SCREENSHOTS HERE" : "DROP MORE SCREENSHOTS"}
+                      </div>
+                      <div className="drop-sub">
+                        {files.length === 0
+                          ? "or tap to browse · PNG, JPG, WEBP · up to 20 images"
+                          : `or tap to browse · ${MAX_SCREENSHOTS - files.length} slot${MAX_SCREENSHOTS - files.length !== 1 ? "s" : ""} remaining`
+                        }
+                      </div>
                     </div>
                   )}
 
+                  {/* Screenshot counter + thumbnails */}
+                  {previews.length > 0 && (
+                    <>
+                      <div className="screenshot-bar">
+                        <div>
+                          <div className={`screenshot-count ${countClass}`}>
+                            {files.length} / {MAX_SCREENSHOTS} SCREENSHOTS LOADED
+                            {nearLimit && " · ALMOST AT LIMIT"}
+                            {atLimit   && " · LIMIT REACHED"}
+                          </div>
+                          {/* pip track */}
+                          <div className="count-track">
+                            {Array.from({ length: MAX_SCREENSHOTS }).map((_, i) => (
+                              <div
+                                key={i}
+                                className={`count-pip ${i < files.length ? `filled ${countClass}` : ""}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Hidden input for "Add More" */}
+                        {!atLimit && (
+                          <>
+                            <input
+                              ref={addMoreRef}
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              style={{ display: "none" }}
+                              onChange={e => addFiles(e.target.files)}
+                            />
+                            <button
+                              className="add-more-btn"
+                              onClick={() => addMoreRef.current?.click()}
+                            >
+                              ＋ Add More
+                            </button>
+                          </>
+                        )}
+                      </div>
+
+                      <div className="thumb-row">
+                        {previews.map((src, i) => (
+                          <div key={i} className="thumb">
+                            <img src={src} alt={`ELD ${i + 1}`} />
+                            <span className="thumb-num">#{i + 1}</span>
+                            <button className="del" onClick={() => removeFile(i)}>✕</button>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Terminal log */}
                   {logs.length > 0 && (
                     <div className="terminal" ref={logRef}>
                       {logs.map((l, i) => (
@@ -995,13 +1131,13 @@ Rules:
                   >
                     {analyzing
                       ? <><div className="spin" />&nbsp;READING YOUR ELD...</>
-                      : "⚡ ANALYZE ELD SCREENSHOTS"
+                      : `⚡ ANALYZE ${files.length > 1 ? `${files.length} SCREENSHOTS` : "ELD SCREENSHOTS"}`
                     }
                   </button>
                 </>
               )}
 
-              {/* Show extracted data */}
+              {/* Extracted data display */}
               {step1Done && !eldData?._raw && (
                 <>
                   {eldData?.days?.length > 0 && (
@@ -1115,7 +1251,9 @@ Rules:
                     />
                   </div>
                   <div className="field">
-                    <label>{pay.type === "permile" ? "Rate per Mile ($)" : pay.type === "flat" ? "N/A" : "Hourly Rate ($)"}</label>
+                    <label>
+                      {pay.type === "permile" ? "Rate per Mile ($)" : pay.type === "flat" ? "N/A" : "Hourly Rate ($)"}
+                    </label>
                     <input
                       type="number"
                       placeholder={pay.type === "permile" ? "0.55" : pay.type === "flat" ? "—" : "18.50"}
@@ -1155,13 +1293,12 @@ Rules:
               <div className="results-header">
                 <div className="results-title">PAY VERIFICATION REPORT</div>
                 <span className={`verdict ${result.verdict === "MATCH" ? "v-match" : result.verdict === "UNDERPAID" ? "v-under" : "v-over"}`}>
-                  {result.verdict === "MATCH" && "✓ HOURS MATCH"}
+                  {result.verdict === "MATCH"     && "✓ HOURS MATCH"}
                   {result.verdict === "UNDERPAID" && "⚠ HOURS SHORT"}
-                  {result.verdict === "OVERPAID" && "↑ HOURS OVER"}
+                  {result.verdict === "OVERPAID"  && "↑ HOURS OVER"}
                 </span>
               </div>
 
-              {/* Hours comparison */}
               <div className="compare-grid">
                 <div className="cg-cell">
                   <div className="cg-label">ELD On-Duty Hours</div>
@@ -1178,11 +1315,14 @@ Rules:
                   <div className={`cg-val ${result.hoursDiff > 0.5 ? "pos" : result.hoursDiff < -0.5 ? "neg" : "warn"}`}>
                     {result.hoursDiff >= 0 ? "+" : ""}{result.hoursDiff.toFixed(2)}h
                   </div>
-                  <div className="cg-sub">{result.hoursDiff < -0.5 ? "Missing from check" : result.hoursDiff > 0.5 ? "Extra on check" : "Within tolerance"}</div>
+                  <div className="cg-sub">
+                    {result.hoursDiff < -0.5  ? "Missing from check"
+                    : result.hoursDiff > 0.5  ? "Extra on check"
+                    : "Within tolerance"}
+                  </div>
                 </div>
               </div>
 
-              {/* Pay comparison */}
               {result.payType !== "flat" && result.rate > 0 && (
                 <div className="pay-compare">
                   <div className="pc-cell">
@@ -1202,7 +1342,6 @@ Rules:
                 </div>
               )}
 
-              {/* Analysis */}
               <div className="analysis">
                 {result.verdict === "MATCH" && (
                   <>Your ELD hours and paycheck hours are <span className="good-text">within acceptable tolerance</span>. Your employer's reported hours align with what your ELD recorded. <strong>No discrepancy detected.</strong></>
@@ -1216,7 +1355,9 @@ Rules:
               </div>
 
               <div className="results-footer">
-                <span>Generated {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })} · LoadSmarter ELD Checker</span>
+                <span>
+                  Generated {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })} · LoadSmarter ELD Checker
+                </span>
                 <button className="reset-btn" onClick={reset}>Run Another Check</button>
               </div>
             </div>
