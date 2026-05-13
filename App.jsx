@@ -34,747 +34,184 @@ const css = `
       repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(28,37,48,0.4) 40px);
   }
 
-  /* ─── HEADER ─── */
   .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 16px 24px;
     border-bottom: 1px solid var(--border);
     background: rgba(8,11,15,0.9);
     backdrop-filter: blur(8px);
-    position: sticky;
-    top: 0;
-    z-index: 50;
+    position: sticky; top: 0; z-index: 50;
   }
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .logo { display: flex; align-items: center; gap: 12px; }
 
   .logo-mark {
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     background: linear-gradient(135deg, var(--orange), var(--amber));
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
   }
 
   .logo-text { line-height: 1; }
+  .logo-text .name { font-family: var(--display); font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
+  .logo-text .tagline { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 1px; }
 
-  .logo-text .name {
-    font-family: var(--display);
-    font-size: 22px;
-    letter-spacing: 0.08em;
-    color: var(--text);
-  }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
 
-  .logo-text .tagline {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-top: 1px;
-  }
+  .pill { font-family: var(--mono); font-size: 10px; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .pill-free    { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .pill-powered { background: rgba(245,158,11,0.08); color: var(--amber); border: 1px solid rgba(245,158,11,0.15); }
 
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  .main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
 
-  .pill {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .pill-free {
-    background: rgba(34,197,94,0.1);
-    color: var(--green);
-    border: 1px solid rgba(34,197,94,0.2);
-  }
-
-  .pill-powered {
-    background: rgba(245,158,11,0.08);
-    color: var(--amber);
-    border: 1px solid rgba(245,158,11,0.15);
-  }
-
-  /* ─── MAIN LAYOUT ─── */
-  .main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 32px 20px 80px;
-  }
-
-  /* ─── STEP PANELS ─── */
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 16px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; transition: border-color 0.2s; }
   .panel.active { border-color: var(--border2); }
   .panel.done   { border-color: rgba(34,197,94,0.2); }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--border);
-  }
+  .panel-header { display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid var(--border); }
 
-  .step-num {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--display);
-    font-size: 16px;
-    flex-shrink: 0;
-    border: 1px solid var(--border2);
-    color: var(--muted);
-    transition: all 0.3s;
-  }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 16px; flex-shrink: 0; border: 1px solid var(--border2); color: var(--muted); transition: all 0.3s; }
+  .panel.active .step-num { background: linear-gradient(135deg, var(--orange), var(--amber)); color: #000; border-color: transparent; }
+  .panel.done   .step-num { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); font-size: 14px; }
 
-  .panel.active .step-num {
-    background: linear-gradient(135deg, var(--orange), var(--amber));
-    color: #000;
-    border-color: transparent;
-  }
+  .panel-title { font-family: var(--display); font-size: 20px; letter-spacing: 0.06em; color: var(--text); }
+  .panel-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
+  .panel-body  { padding: 22px; }
 
-  .panel.done .step-num {
-    background: rgba(34,197,94,0.15);
-    color: var(--green);
-    border-color: rgba(34,197,94,0.3);
-    font-size: 14px;
-  }
+  .drop-zone { border: 2px dashed var(--border2); border-radius: 10px; padding: 40px 20px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; background: rgba(255,255,255,0.01); }
+  .drop-zone:hover, .drop-zone.over { border-color: var(--amber); background: rgba(245,158,11,0.03); }
+  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
 
-  .panel-title {
-    font-family: var(--display);
-    font-size: 20px;
-    letter-spacing: 0.06em;
-    color: var(--text);
-  }
+  .drop-icon  { font-size: 40px; margin-bottom: 12px; display: block; }
+  .drop-title { font-family: var(--display); font-size: 22px; letter-spacing: 0.06em; color: var(--text); margin-bottom: 6px; }
+  .drop-sub   { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
 
-  .panel-sub {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: 1px;
-  }
+  .screenshot-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; margin-bottom: 10px; }
 
-  .panel-body { padding: 22px; }
-
-  /* ─── UPLOAD ─── */
-  .drop-zone {
-    border: 2px dashed var(--border2);
-    border-radius: 10px;
-    padding: 40px 20px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    background: rgba(255,255,255,0.01);
-  }
-
-  .drop-zone:hover, .drop-zone.over {
-    border-color: var(--amber);
-    background: rgba(245,158,11,0.03);
-  }
-
-  .drop-zone input[type=file] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer;
-    width: 100%; height: 100%;
-  }
-
-  .drop-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-
-  .drop-title {
-    font-family: var(--display);
-    font-size: 22px;
-    letter-spacing: 0.06em;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-
-  .drop-sub {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  /* ─── SCREENSHOT COUNTER BAR ─── */
-  .screenshot-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 16px;
-    margin-bottom: 10px;
-  }
-
-  .screenshot-count {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    color: var(--muted);
-    transition: color 0.2s;
-  }
-
+  .screenshot-count { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); transition: color 0.2s; }
   .screenshot-count.warn  { color: var(--amber); }
   .screenshot-count.limit { color: var(--red); }
 
-  .count-track {
-    display: flex;
-    gap: 3px;
-    align-items: center;
-    margin-top: 5px;
-  }
-
-  .count-pip {
-    width: 10px;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border2);
-    transition: background 0.15s;
-  }
-
+  .count-track { display: flex; gap: 3px; align-items: center; margin-top: 5px; }
+  .count-pip { width: 10px; height: 4px; border-radius: 2px; background: var(--border2); transition: background 0.15s; }
   .count-pip.filled       { background: var(--amber); }
   .count-pip.filled.warn  { background: var(--orange); }
   .count-pip.filled.limit { background: var(--red); }
 
-  .add-more-btn {
-    background: rgba(245,158,11,0.08);
-    border: 1px solid rgba(245,158,11,0.2);
-    border-radius: 6px;
-    color: var(--amber);
-    font-family: var(--mono);
-    font-size: 11px;
-    padding: 6px 14px;
-    cursor: pointer;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
+  .add-more-btn { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 6px; color: var(--amber); font-family: var(--mono); font-size: 11px; padding: 6px 14px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; white-space: nowrap; }
+  .add-more-btn:hover { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); }
 
-  .add-more-btn:hover {
-    background: rgba(245,158,11,0.15);
-    border-color: rgba(245,158,11,0.4);
-  }
-
-  /* ─── THUMBNAILS ─── */
-  .thumb-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .thumb {
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border2);
-    flex-shrink: 0;
-  }
-
-  .thumb img {
-    width: 90px;
-    height: 64px;
-    object-fit: cover;
-    display: block;
-  }
-
-  .thumb-num {
-    position: absolute;
-    bottom: 3px;
-    left: 4px;
-    font-family: var(--mono);
-    font-size: 9px;
-    color: rgba(255,255,255,0.6);
-    background: rgba(0,0,0,0.5);
-    padding: 1px 4px;
-    border-radius: 3px;
-    letter-spacing: 0.05em;
-  }
-
-  .thumb .del {
-    position: absolute;
-    top: 3px; right: 3px;
-    width: 18px; height: 18px;
-    background: rgba(0,0,0,0.75);
-    border: none;
-    border-radius: 50%;
-    color: #ccc;
-    font-size: 9px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
+  .thumb-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border2); flex-shrink: 0; }
+  .thumb img { width: 90px; height: 64px; object-fit: cover; display: block; }
+  .thumb-num { position: absolute; bottom: 3px; left: 4px; font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.6); background: rgba(0,0,0,0.5); padding: 1px 4px; border-radius: 3px; letter-spacing: 0.05em; }
+  .thumb .del { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,0.75); border: none; border-radius: 50%; color: #ccc; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
   .thumb .del:hover { background: var(--red); color: #fff; }
 
-  /* ─── TERMINAL LOG ─── */
-  .terminal {
-    background: #050709;
-    border: 1px solid #0F1820;
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-top: 14px;
-    font-family: var(--mono);
-    font-size: 12px;
-    max-height: 160px;
-    overflow-y: auto;
-    line-height: 1.8;
-  }
-
+  .terminal { background: #050709; border: 1px solid #0F1820; border-radius: 8px; padding: 14px 16px; margin-top: 14px; font-family: var(--mono); font-size: 12px; max-height: 160px; overflow-y: auto; line-height: 1.8; }
   .log-line::before { content: '> '; color: var(--amber); }
   .log-line { color: #4ADE80; display: block; }
   .log-line.dim  { color: #1E4A30; }
   .log-line.warn { color: var(--amber); }
   .log-line.err  { color: var(--red); }
 
-  .cursor {
-    display: inline-block;
-    width: 8px; height: 13px;
-    background: #4ADE80;
-    animation: blink 1s step-end infinite;
-    vertical-align: middle;
-    margin-left: 4px;
-  }
-
+  .cursor { display: inline-block; width: 8px; height: 13px; background: #4ADE80; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 4px; }
   @keyframes blink { 50% { opacity: 0; } }
 
-  /* ─── ERROR ─── */
-  .err-box {
-    background: rgba(239,68,68,0.07);
-    border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 8px;
-    padding: 12px 16px;
-    color: #FCA5A5;
-    font-size: 14px;
-    margin-top: 12px;
-    font-family: var(--mono);
-  }
+  .err-box { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 12px 16px; color: #FCA5A5; font-size: 14px; margin-top: 12px; font-family: var(--mono); }
 
-  /* ─── BUTTONS ─── */
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 8px;
-    font-family: var(--display);
-    font-size: 20px;
-    letter-spacing: 0.12em;
-    cursor: pointer;
-    margin-top: 16px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--orange), var(--amber));
-    color: #000;
-  }
-
-  .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.1);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(234,88,12,0.25);
-  }
-
-  .btn-primary:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .btn-secondary {
-    background: rgba(245,158,11,0.1);
-    color: var(--amber);
-    border: 1px solid rgba(245,158,11,0.2);
-    font-size: 17px;
-  }
-
+  .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; cursor: pointer; margin-top: 16px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .btn-primary { background: linear-gradient(135deg, var(--orange), var(--amber)); color: #000; }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(234,88,12,0.25); }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); font-size: 17px; }
   .btn-secondary:hover:not(:disabled) { background: rgba(245,158,11,0.15); }
   .btn-secondary:disabled { opacity: 0.3; cursor: not-allowed; }
 
-  /* ─── SPINNER ─── */
-  .spin {
-    width: 18px; height: 18px;
-    border: 2px solid rgba(0,0,0,0.2);
-    border-top-color: #000;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
-
+  .spin { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ─── ELD DATA TABLE ─── */
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: var(--mono);
-    font-size: 12px;
-  }
-
-  .data-table th {
-    text-align: left;
-    padding: 8px 12px;
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    font-weight: 400;
-  }
-
-  .data-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(28,37,48,0.5);
-    color: #B0C4D8;
-  }
-
+  .data-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  .data-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 400; }
+  .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(28,37,48,0.5); color: #B0C4D8; }
   .data-table tr:last-child td { border-bottom: none; }
 
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-  }
-
-  .tag-drive { background: rgba(234,88,12,0.12);  color: #FB923C; border: 1px solid rgba(234,88,12,0.2); }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; }
+  .tag-drive { background: rgba(234,88,12,0.12);  color: #FB923C;      border: 1px solid rgba(234,88,12,0.2); }
   .tag-duty  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
   .tag-off   { background: rgba(90,112,144,0.1);  color: var(--muted); border: 1px solid rgba(90,112,144,0.15); }
-  .tag-sleep { background: rgba(99,102,241,0.1);  color: #A5B4FC; border: 1px solid rgba(99,102,241,0.2); }
+  .tag-sleep { background: rgba(99,102,241,0.1);  color: #A5B4FC;      border: 1px solid rgba(99,102,241,0.2); }
 
-  /* ─── TOTALS STRIP ─── */
-  .totals-strip {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 14px;
-  }
-
-  .total-cell {
-    background: var(--surface2);
-    padding: 14px 16px;
-    text-align: center;
-  }
-
-  .total-cell .tc-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .total-cell .tc-val {
-    font-family: var(--display);
-    font-size: 26px;
-    letter-spacing: 0.04em;
-    color: var(--amber);
-  }
-
+  .totals-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 14px; }
+  .total-cell { background: var(--surface2); padding: 14px 16px; text-align: center; }
+  .total-cell .tc-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
+  .total-cell .tc-val   { font-family: var(--display); font-size: 26px; letter-spacing: 0.04em; color: var(--amber); }
   .total-cell.highlight .tc-val { color: var(--text); font-size: 30px; }
 
-  /* ─── FORM ─── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
 
-  .field label {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .field input, .field select {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    padding: 11px 14px;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    transition: border-color 0.2s;
-    appearance: none;
-  }
-
-  .field input:focus, .field select:focus {
-    outline: none;
-    border-color: var(--amber);
-  }
-
+  .field label { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 6px; padding: 11px 14px; color: var(--text); font-family: var(--mono); font-size: 14px; transition: border-color 0.2s; appearance: none; }
+  .field input:focus, .field select:focus { outline: none; border-color: var(--amber); }
   .field select option { background: #0E1318; }
   .field.full { grid-column: 1 / -1; }
 
-  /* ─── RESULTS ─── */
-  .results-wrap {
-    background: var(--surface);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    margin-bottom: 16px;
-    animation: fadeUp 0.4s ease;
-  }
+  .results-wrap { background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 16px; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  .results-header { padding: 18px 22px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .results-title { font-family: var(--display); font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
 
-  .results-header {
-    padding: 18px 22px;
-    background: var(--surface2);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .results-title {
-    font-family: var(--display);
-    font-size: 22px;
-    letter-spacing: 0.08em;
-    color: var(--text);
-  }
-
-  .verdict {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 20px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
+  .verdict { font-family: var(--mono); font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
   .v-match { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
   .v-under { background: rgba(239,68,68,0.1);   color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
   .v-over  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
 
-  .compare-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
   @media (max-width: 520px) { .compare-grid { grid-template-columns: 1fr; } }
-
-  .cg-cell {
-    padding: 22px;
-    border-right: 1px solid var(--border);
-  }
-
+  .cg-cell { padding: 22px; border-right: 1px solid var(--border); }
   .cg-cell:last-child { border-right: none; }
-
-  .cg-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .cg-val {
-    font-family: var(--display);
-    font-size: 38px;
-    letter-spacing: 0.04em;
-    line-height: 1;
-    color: var(--text);
-  }
-
+  .cg-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .cg-val   { font-family: var(--display); font-size: 38px; letter-spacing: 0.04em; line-height: 1; color: var(--text); }
   .cg-val.pos  { color: var(--green); }
   .cg-val.neg  { color: var(--red); }
   .cg-val.warn { color: var(--amber); }
+  .cg-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 5px; }
 
-  .cg-sub {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 5px;
-  }
-
-  .pay-compare {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .pay-compare { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
   @media (max-width: 520px) { .pay-compare { grid-template-columns: 1fr; } }
-
-  .pc-cell {
-    padding: 18px 22px;
-    border-right: 1px solid var(--border);
-  }
-
+  .pc-cell { padding: 18px 22px; border-right: 1px solid var(--border); }
   .pc-cell:last-child { border-right: none; }
-
-  .pc-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .pc-val {
-    font-family: var(--display);
-    font-size: 28px;
-    letter-spacing: 0.04em;
-    color: var(--text);
-  }
-
+  .pc-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
+  .pc-val   { font-family: var(--display); font-size: 28px; letter-spacing: 0.04em; color: var(--text); }
   .pc-val.pos { color: var(--green); }
   .pc-val.neg { color: var(--red); }
 
-  .analysis {
-    padding: 18px 22px;
-    font-size: 15px;
-    color: #8AA0BC;
-    line-height: 1.7;
-    border-bottom: 1px solid var(--border);
-  }
+  .analysis { padding: 18px 22px; font-size: 15px; color: #8AA0BC; line-height: 1.7; border-bottom: 1px solid var(--border); }
+  .analysis strong          { color: var(--text); }
+  .analysis .highlight-text { color: var(--amber); font-weight: 600; }
+  .analysis .danger-text    { color: var(--red);   font-weight: 600; }
+  .analysis .good-text      { color: var(--green); font-weight: 600; }
 
-  .analysis strong            { color: var(--text); }
-  .analysis .highlight-text   { color: var(--amber); font-weight: 600; }
-  .analysis .danger-text      { color: var(--red);   font-weight: 600; }
-  .analysis .good-text        { color: var(--green); font-weight: 600; }
+  .results-footer { padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .results-footer span { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
 
-  .results-footer {
-    padding: 12px 22px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .results-footer span {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-  }
-
-  .reset-btn {
-    background: none;
-    border: 1px solid var(--border2);
-    border-radius: 6px;
-    color: var(--muted);
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 12px;
-    cursor: pointer;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-
+  .reset-btn { background: none; border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 10px; padding: 4px 12px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
   .reset-btn:hover { border-color: var(--amber); color: var(--amber); }
 
-  /* ─── NOTE BOX ─── */
-  .note-box {
-    background: rgba(245,158,11,0.05);
-    border: 1px solid rgba(245,158,11,0.15);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #D97706;
-    margin-top: 12px;
-    line-height: 1.6;
-  }
+  .note-box { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; padding: 12px 16px; font-family: var(--mono); font-size: 12px; color: #D97706; margin-top: 12px; line-height: 1.6; }
 
-  /* ─── HERO ─── */
-  .hero {
-    text-align: center;
-    padding: 32px 20px 28px;
-  }
-
-  .hero-title {
-    font-family: var(--display);
-    font-size: clamp(38px, 8vw, 64px);
-    letter-spacing: 0.06em;
-    line-height: 1;
-    background: linear-gradient(135deg, #F59E0B, #EA580C, #F59E0B);
-    background-size: 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 4s linear infinite;
-    margin-bottom: 10px;
-  }
-
+  .hero { text-align: center; padding: 32px 20px 28px; }
+  .hero-title { font-family: var(--display); font-size: clamp(38px, 8vw, 64px); letter-spacing: 0.06em; line-height: 1; background: linear-gradient(135deg, #F59E0B, #EA580C, #F59E0B); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s linear infinite; margin-bottom: 10px; }
   @keyframes shimmer { to { background-position: 200% center; } }
-
-  .hero-sub {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .divider-line {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border2), transparent);
-    margin: 4px 0 24px;
-  }
+  .hero-sub { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  .divider-line { height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); margin: 4px 0 24px; }
 `;
 
-// ─── CONSTANTS ─────────────────────────────────────────
 const MAX_SCREENSHOTS = 20;
 const WARN_AT = 15;
 
-// ─── HELPERS ───────────────────────────────────────────
 function toBase64(file) {
   return new Promise((res, rej) => {
     const r = new FileReader();
@@ -791,32 +228,23 @@ function parseJSON(text) {
   } catch { return null; }
 }
 
-function fh(n, d = 1) {
-  return typeof n === "number" ? n.toFixed(d) + "h" : "—";
-}
-
+function fh(n, d = 1) { return typeof n === "number" ? n.toFixed(d) + "h" : "—"; }
 function fd(n) {
   if (typeof n !== "number") return "—";
   return (n >= 0 ? "+" : "") + "$" + Math.abs(n).toFixed(2);
 }
 
-// ─── MAIN COMPONENT ────────────────────────────────────
 export default function ELDPayChecker() {
-  // Step 1 state
-  const [files, setFiles]       = useState([]);
-  const [previews, setPreviews] = useState([]);
-  const [over, setOver]         = useState(false);
-  const [logs, setLogs]         = useState([]);
+  const [files,     setFiles]     = useState([]);
+  const [previews,  setPreviews]  = useState([]);
+  const [over,      setOver]      = useState(false);
+  const [logs,      setLogs]      = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError]       = useState("");
-  const [eldData, setEldData]   = useState(null);
-
-  // Step 2 state
-  const [pay, setPay]           = useState({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
+  const [error,     setError]     = useState("");
+  const [eldData,   setEldData]   = useState(null);
+  const [pay,       setPay]       = useState({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
   const [comparing, setComparing] = useState(false);
-
-  // Results
-  const [result, setResult]     = useState(null);
+  const [result,    setResult]    = useState(null);
 
   const fileRef    = useRef();
   const addMoreRef = useRef();
@@ -827,20 +255,22 @@ export default function ELDPayChecker() {
     setTimeout(() => { if (logRef.current) logRef.current.scrollTop = 9999; }, 50);
   };
 
-  // ── Add files (enforces MAX_SCREENSHOTS cap) ──────────
+  // ── FIXED: setFiles and setPreviews are called independently, not nested ──
   const addFiles = useCallback((incoming) => {
     const valid = Array.from(incoming).filter(f => f.type.startsWith("image/"));
     if (!valid.length) return;
 
     setFiles(prev => {
+      const slots = MAX_SCREENSHOTS - prev.length;
+      if (slots <= 0) return prev;
+      return [...prev, ...valid.slice(0, slots)];
+    });
+
+    setPreviews(prev => {
       const slots   = MAX_SCREENSHOTS - prev.length;
       if (slots <= 0) return prev;
       const allowed = valid.slice(0, slots);
-      // Build preview URLs only for the allowed slice
-      allowed.forEach(f => {
-        setPreviews(p => [...p, URL.createObjectURL(f)]);
-      });
-      return [...prev, ...allowed];
+      return [...prev, ...allowed.map(f => URL.createObjectURL(f))];
     });
   }, []);
 
@@ -849,7 +279,6 @@ export default function ELDPayChecker() {
     setPreviews(p => p.filter((_, idx) => idx !== i));
   };
 
-  // ── Analyze ───────────────────────────────────────────
   const analyzeELD = async () => {
     setAnalyzing(true);
     setLogs([]);
@@ -863,7 +292,6 @@ export default function ELDPayChecker() {
       log("Encoding images to base64...", "dim");
 
       const encoded = await Promise.all(files.map(toBase64));
-
       log("Images encoded. Connecting to AI...");
 
       const imageBlocks = encoded.map((b64, i) => ({
@@ -871,7 +299,7 @@ export default function ELDPayChecker() {
         source: { type: "base64", media_type: files[i].type || "image/jpeg", data: b64 },
       }));
 
-      const systemPrompt = `You are an expert ELD (Electronic Logging Device) data reader. Your job is to extract hours-of-service data from ELD screenshots taken by truck drivers. The user may provide multiple screenshots covering multiple days or a full pay period — treat them all as one continuous log. Return ONLY valid JSON — no prose, no markdown fences, no explanation.`;
+      const systemPrompt = `You are an expert ELD (Electronic Logging Device) data reader. Extract hours-of-service data from ELD screenshots. The user may provide multiple screenshots covering multiple days or a full pay period — treat them all as one continuous log. Return ONLY valid JSON — no prose, no markdown fences, no explanation.`;
 
       const userPrompt = `Analyze ALL of these ELD screenshots together as one continuous log and extract all hours-of-service data.
 
@@ -915,10 +343,7 @@ Rules:
           model: "claude-sonnet-4-20250514",
           max_tokens: 2000,
           system: systemPrompt,
-          messages: [{
-            role: "user",
-            content: [...imageBlocks, { type: "text", text: userPrompt }],
-          }],
+          messages: [{ role: "user", content: [...imageBlocks, { type: "text", text: userPrompt }] }],
         }),
       });
 
@@ -926,7 +351,6 @@ Rules:
       if (data.error) throw new Error(data.error.message);
 
       log("Response received. Parsing data...");
-
       const raw    = (data.content || []).map(c => c.text || "").join("\n");
       const parsed = parseJSON(raw);
 
@@ -946,7 +370,6 @@ Rules:
     }
   };
 
-  // ── Pay comparison ────────────────────────────────────
   const calcComparison = () => {
     setComparing(true);
     const eldHours  = eldData?.weeklyTotals?.totalOnDuty || 0;
@@ -954,20 +377,11 @@ Rules:
     const rate      = parseFloat(pay.rate)  || 0;
     const grossPay  = parseFloat(pay.gross) || 0;
     const hoursDiff = paidHours - eldHours;
-
-    let expectedPay = 0;
-    if (pay.type === "hourly" && rate > 0) {
-      expectedPay = eldHours * rate;
-    } else {
-      expectedPay = grossPay;
-    }
-
-    const payDiff = grossPay - expectedPay;
-
+    const expectedPay = pay.type === "hourly" && rate > 0 ? eldHours * rate : grossPay;
+    const payDiff   = grossPay - expectedPay;
     let verdict = "MATCH";
-    if (hoursDiff < -0.5)      verdict = "UNDERPAID";
-    else if (hoursDiff > 0.5)  verdict = "OVERPAID";
-
+    if (hoursDiff < -0.5)     verdict = "UNDERPAID";
+    else if (hoursDiff > 0.5) verdict = "OVERPAID";
     setTimeout(() => {
       setResult({ eldHours, paidHours, hoursDiff, rate, grossPay, expectedPay, payDiff, verdict, payType: pay.type });
       setComparing(false);
@@ -981,20 +395,17 @@ Rules:
     setError("");
   };
 
-  // ── Derived state ─────────────────────────────────────
-  const step1Done   = !!eldData;
-  const canCompare  = step1Done && pay.hours && pay.gross;
-  const atLimit     = files.length >= MAX_SCREENSHOTS;
-  const nearLimit   = files.length >= WARN_AT && !atLimit;
-
-  const countClass  = atLimit ? "limit" : nearLimit ? "warn" : "";
+  const step1Done  = !!eldData;
+  const canCompare = step1Done && pay.hours && pay.gross;
+  const atLimit    = files.length >= MAX_SCREENSHOTS;
+  const nearLimit  = files.length >= WARN_AT && !atLimit;
+  const countClass = atLimit ? "limit" : nearLimit ? "warn" : "";
 
   return (
     <>
       <style>{css}</style>
       <div className="app">
 
-        {/* TOP BAR */}
         <div className="topbar">
           <div className="logo">
             <div className="logo-mark">⚡</div>
@@ -1010,15 +421,13 @@ Rules:
         </div>
 
         <div className="main">
-
-          {/* HERO */}
           <div className="hero">
             <div className="hero-title">DID YOU GET PAID RIGHT?</div>
             <div className="hero-sub">Upload your ELD screenshots · Enter your check · Get the truth</div>
           </div>
           <div className="divider-line" />
 
-          {/* ─── STEP 1: UPLOAD ─── */}
+          {/* ─── STEP 1 ─── */}
           <div className={`panel ${step1Done ? "done" : "active"}`}>
             <div className="panel-header">
               <div className="step-num">{step1Done ? "✓" : "1"}</div>
@@ -1030,7 +439,6 @@ Rules:
             <div className="panel-body">
               {!step1Done && (
                 <>
-                  {/* Drop zone — only show when under limit */}
                   {!atLimit && (
                     <div
                       className={`drop-zone ${over ? "over" : ""}`}
@@ -1043,43 +451,37 @@ Rules:
                         type="file"
                         accept="image/*"
                         multiple
-                        onChange={e => addFiles(e.target.files)}
+                        onChange={e => { addFiles(e.target.files); e.target.value = ""; }}
                       />
                       <span className="drop-icon">📱</span>
                       <div className="drop-title">
-                        {files.length === 0 ? "DROP SCREENSHOTS HERE" : "DROP MORE SCREENSHOTS"}
+                        {previews.length === 0 ? "DROP SCREENSHOTS HERE" : "DROP MORE SCREENSHOTS"}
                       </div>
                       <div className="drop-sub">
-                        {files.length === 0
+                        {previews.length === 0
                           ? "or tap to browse · PNG, JPG, WEBP · up to 20 images"
-                          : `or tap to browse · ${MAX_SCREENSHOTS - files.length} slot${MAX_SCREENSHOTS - files.length !== 1 ? "s" : ""} remaining`
+                          : `or tap to browse · ${MAX_SCREENSHOTS - previews.length} slot${MAX_SCREENSHOTS - previews.length !== 1 ? "s" : ""} remaining`
                         }
                       </div>
                     </div>
                   )}
 
-                  {/* Screenshot counter + thumbnails */}
                   {previews.length > 0 && (
                     <>
                       <div className="screenshot-bar">
                         <div>
                           <div className={`screenshot-count ${countClass}`}>
-                            {files.length} / {MAX_SCREENSHOTS} SCREENSHOTS LOADED
+                            {previews.length} / {MAX_SCREENSHOTS} SCREENSHOTS LOADED
                             {nearLimit && " · ALMOST AT LIMIT"}
                             {atLimit   && " · LIMIT REACHED"}
                           </div>
-                          {/* pip track */}
                           <div className="count-track">
                             {Array.from({ length: MAX_SCREENSHOTS }).map((_, i) => (
-                              <div
-                                key={i}
-                                className={`count-pip ${i < files.length ? `filled ${countClass}` : ""}`}
-                              />
+                              <div key={i} className={`count-pip ${i < previews.length ? `filled ${countClass}` : ""}`} />
                             ))}
                           </div>
                         </div>
 
-                        {/* Hidden input for "Add More" */}
                         {!atLimit && (
                           <>
                             <input
@@ -1088,12 +490,9 @@ Rules:
                               accept="image/*"
                               multiple
                               style={{ display: "none" }}
-                              onChange={e => addFiles(e.target.files)}
+                              onChange={e => { addFiles(e.target.files); e.target.value = ""; }}
                             />
-                            <button
-                              className="add-more-btn"
-                              onClick={() => addMoreRef.current?.click()}
-                            >
+                            <button className="add-more-btn" onClick={() => addMoreRef.current?.click()}>
                               ＋ Add More
                             </button>
                           </>
@@ -1112,7 +511,6 @@ Rules:
                     </>
                   )}
 
-                  {/* Terminal log */}
                   {logs.length > 0 && (
                     <div className="terminal" ref={logRef}>
                       {logs.map((l, i) => (
@@ -1137,19 +535,14 @@ Rules:
                 </>
               )}
 
-              {/* Extracted data display */}
               {step1Done && !eldData?._raw && (
                 <>
                   {eldData?.days?.length > 0 && (
                     <table className="data-table">
                       <thead>
                         <tr>
-                          <th>Date</th>
-                          <th>Driving</th>
-                          <th>On Duty ND</th>
-                          <th>Off Duty</th>
-                          <th>Sleeper</th>
-                          <th>Total On Duty</th>
+                          <th>Date</th><th>Driving</th><th>On Duty ND</th>
+                          <th>Off Duty</th><th>Sleeper</th><th>Total On Duty</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1188,9 +581,7 @@ Rules:
                     </div>
                   </div>
 
-                  {eldData?.violations && (
-                    <div className="note-box">⚠ {eldData.violations}</div>
-                  )}
+                  {eldData?.violations && <div className="note-box">⚠ {eldData.violations}</div>}
 
                   <button className="btn btn-secondary" style={{ marginTop: 14 }} onClick={reset}>
                     ↺ Start Over
@@ -1204,15 +595,13 @@ Rules:
                     <span className="log-line">Raw AI output (auto-parse failed):</span>
                     <span className="log-line dim">{eldData._raw}</span>
                   </div>
-                  <button className="btn btn-secondary" style={{ marginTop: 14 }} onClick={reset}>
-                    ↺ Try Again
-                  </button>
+                  <button className="btn btn-secondary" style={{ marginTop: 14 }} onClick={reset}>↺ Try Again</button>
                 </>
               )}
             </div>
           </div>
 
-          {/* ─── STEP 2: PAYCHECK ─── */}
+          {/* ─── STEP 2 ─── */}
           {step1Done && !eldData?._raw && (
             <div className={`panel ${result ? "done" : "active"}`}>
               <div className="panel-header">
@@ -1226,12 +615,7 @@ Rules:
                 <div className="form-grid">
                   <div className="field">
                     <label>Week Of</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 04/14 – 04/20"
-                      value={pay.week}
-                      onChange={e => setPay(p => ({ ...p, week: e.target.value }))}
-                    />
+                    <input type="text" placeholder="e.g. 04/14 – 04/20" value={pay.week} onChange={e => setPay(p => ({ ...p, week: e.target.value }))} />
                   </div>
                   <div className="field">
                     <label>Pay Structure</label>
@@ -1243,45 +627,19 @@ Rules:
                   </div>
                   <div className="field">
                     <label>Hours Listed on Paycheck</label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 44.5"
-                      value={pay.hours}
-                      onChange={e => setPay(p => ({ ...p, hours: e.target.value }))}
-                    />
+                    <input type="number" placeholder="e.g. 44.5" value={pay.hours} onChange={e => setPay(p => ({ ...p, hours: e.target.value }))} />
                   </div>
                   <div className="field">
-                    <label>
-                      {pay.type === "permile" ? "Rate per Mile ($)" : pay.type === "flat" ? "N/A" : "Hourly Rate ($)"}
-                    </label>
-                    <input
-                      type="number"
-                      placeholder={pay.type === "permile" ? "0.55" : pay.type === "flat" ? "—" : "18.50"}
-                      value={pay.rate}
-                      disabled={pay.type === "flat"}
-                      onChange={e => setPay(p => ({ ...p, rate: e.target.value }))}
-                    />
+                    <label>{pay.type === "permile" ? "Rate per Mile ($)" : pay.type === "flat" ? "N/A" : "Hourly Rate ($)"}</label>
+                    <input type="number" placeholder={pay.type === "permile" ? "0.55" : pay.type === "flat" ? "—" : "18.50"} value={pay.rate} disabled={pay.type === "flat"} onChange={e => setPay(p => ({ ...p, rate: e.target.value }))} />
                   </div>
                   <div className="field full">
                     <label>Gross Pay on Check ($)</label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 920.00"
-                      value={pay.gross}
-                      onChange={e => setPay(p => ({ ...p, gross: e.target.value }))}
-                    />
+                    <input type="number" placeholder="e.g. 920.00" value={pay.gross} onChange={e => setPay(p => ({ ...p, gross: e.target.value }))} />
                   </div>
                 </div>
-
-                <button
-                  className="btn btn-primary"
-                  disabled={!canCompare || comparing}
-                  onClick={calcComparison}
-                >
-                  {comparing
-                    ? <><div className="spin" />&nbsp;CALCULATING...</>
-                    : "🔍 CALCULATE PAY DISCREPANCY"
-                  }
+                <button className="btn btn-primary" disabled={!canCompare || comparing} onClick={calcComparison}>
+                  {comparing ? <><div className="spin" />&nbsp;CALCULATING...</> : "🔍 CALCULATE PAY DISCREPANCY"}
                 </button>
               </div>
             </div>
@@ -1316,9 +674,7 @@ Rules:
                     {result.hoursDiff >= 0 ? "+" : ""}{result.hoursDiff.toFixed(2)}h
                   </div>
                   <div className="cg-sub">
-                    {result.hoursDiff < -0.5  ? "Missing from check"
-                    : result.hoursDiff > 0.5  ? "Extra on check"
-                    : "Within tolerance"}
+                    {result.hoursDiff < -0.5 ? "Missing from check" : result.hoursDiff > 0.5 ? "Extra on check" : "Within tolerance"}
                   </div>
                 </div>
               </div>
@@ -1355,9 +711,7 @@ Rules:
               </div>
 
               <div className="results-footer">
-                <span>
-                  Generated {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })} · LoadSmarter ELD Checker
-                </span>
+                <span>Generated {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })} · LoadSmarter ELD Checker</span>
                 <button className="reset-btn" onClick={reset}>Run Another Check</button>
               </div>
             </div>
