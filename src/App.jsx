@@ -1,205 +1,214 @@
 import { useState, useRef } from "react";
 
+const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+
+const MAX = 30;
+const BATCH_SIZE = 10;
+const BACKEND = "https://loadsmarter-backend.vercel.app";
+
 const css = `
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Bebas+Neue&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #080B0F; --surface: #0E1318; --surface2: #141B22;
-    --border: #1C2530; --border2: #243040;
-    --amber: #F59E0B; --orange: #EA580C; --green: #22C55E;
-    --red: #EF4444; --text: #E2EAF4; --muted: #5A7090;
+    --teal: #1dd1a1; --teal-dim: #17b08a; --teal-glow: rgba(29,209,161,0.1);
+    --gold: #f39c12; --gold-dim: #d68910; --gold-glow: rgba(243,156,18,0.1);
+    --bg: #0a0d11; --surface: #111418; --surface2: #171b22;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #6b7892; --red: #e74c3c;
     --mono: 'Share Tech Mono', monospace;
     --display: 'Bebas Neue', sans-serif;
     --ui: 'Rajdhani', sans-serif;
   }
+  html { scroll-behavior: smooth; }
   body { background: var(--bg); color: var(--text); font-family: var(--ui); }
-  .app {
-    min-height: 100vh; background: var(--bg);
-    background-image:
-      radial-gradient(ellipse 80% 40% at 50% -10%, rgba(234,88,12,0.08) 0%, transparent 60%),
-      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(28,37,48,0.4) 40px),
-      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(28,37,48,0.4) 40px);
-  }
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 24px; border-bottom: 1px solid var(--border);
-    background: rgba(8,11,15,0.9); backdrop-filter: blur(8px);
-    position: sticky; top: 0; z-index: 50;
-  }
-  .logo { display: flex; align-items: center; gap: 12px; }
-  .logo-mark {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, var(--orange), var(--amber));
-    clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
-    display: flex; align-items: center; justify-content: center; font-size: 16px;
-  }
-  .logo-text .name { font-family: var(--display); font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
-  .logo-text .tagline { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; }
-  .topbar-right { display: flex; gap: 8px; }
-  .pill { font-family: var(--mono); font-size: 10px; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.1em; text-transform: uppercase; }
-  .pill-free    { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
-  .pill-powered { background: rgba(245,158,11,0.08); color: var(--amber); border: 1px solid rgba(245,158,11,0.15); }
-  .main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-  .hero { text-align: center; padding: 32px 20px 28px; }
-  .hero-title {
-    font-family: var(--display); font-size: clamp(38px, 8vw, 64px);
-    letter-spacing: 0.06em; line-height: 1;
-    background: linear-gradient(135deg, #F59E0B, #EA580C, #F59E0B);
-    background-size: 200%; -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; background-clip: text;
-    animation: shimmer 4s linear infinite; margin-bottom: 10px;
-  }
-  @keyframes shimmer { to { background-position: 200% center; } }
-  .hero-sub { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
-  .divider-line { height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent); margin: 4px 0 24px; }
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; transition: border-color 0.2s; }
-  .panel.active { border-color: var(--border2); }
-  .panel.done   { border-color: rgba(34,197,94,0.2); }
-  .panel-header { display: flex; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid var(--border); }
-  .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 16px; flex-shrink: 0; border: 1px solid var(--border2); color: var(--muted); transition: all 0.3s; }
-  .panel.active .step-num { background: linear-gradient(135deg, var(--orange), var(--amber)); color: #000; border-color: transparent; }
-  .panel.done   .step-num { background: rgba(34,197,94,0.15); color: var(--green); border-color: rgba(34,197,94,0.3); font-size: 14px; }
-  .panel-title { font-family: var(--display); font-size: 20px; letter-spacing: 0.06em; color: var(--text); }
-  .panel-sub   { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
-  .panel-body  { padding: 22px; }
 
-  /* ── UPLOAD BUTTON ── */
-  .upload-btn {
-    width: 100%; padding: 32px 20px;
-    border: 2px dashed var(--border2); border-radius: 10px;
-    background: rgba(255,255,255,0.01); cursor: pointer;
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
-    transition: all 0.2s; position: relative;
-  }
-  .upload-btn:hover { border-color: var(--amber); background: rgba(245,158,11,0.03); }
-  .upload-btn input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .upload-icon { font-size: 40px; }
-  .upload-title { font-family: var(--display); font-size: 24px; letter-spacing: 0.06em; color: var(--text); }
-  .upload-hint  { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-align: center; line-height: 1.7; }
-  .upload-hint span { color: var(--amber); }
+  /* NAV */
+  .nav { display:flex; align-items:center; justify-content:space-between; padding:18px 40px; border-bottom:1px solid var(--border); background:rgba(10,13,17,0.94); backdrop-filter:blur(8px); position:sticky; top:0; z-index:100; }
+  .logo { font-family:var(--display); font-size:24px; letter-spacing:0.08em; color:var(--text); }
+  .logo em { color:var(--teal); font-style:normal; }
+  .nav-right { display:flex; gap:12px; align-items:center; }
+  .pill-free { background:var(--teal-glow); color:var(--teal); border:1px solid rgba(29,209,161,0.2); font-family:var(--mono); font-size:10px; padding:4px 12px; border-radius:20px; letter-spacing:0.1em; }
 
-  /* ── COUNTER BAR ── */
-  .counter-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 18px; margin-bottom: 12px;
-    padding: 12px 16px;
-    background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px;
-  }
-  .counter-left { display: flex; flex-direction: column; gap: 6px; }
-  .counter-text { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; color: var(--muted); }
-  .counter-text.warn  { color: var(--amber); }
-  .counter-text.full  { color: var(--red); }
-  .pip-row { display: flex; gap: 3px; flex-wrap: wrap; max-width: 240px; }
-  .pip { width: 9px; height: 4px; border-radius: 2px; background: var(--border2); }
-  .pip.on      { background: var(--amber); }
-  .pip.on.warn { background: var(--orange); }
-  .pip.on.full { background: var(--red); }
-  .add-btn {
-    font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 8px 16px; border-radius: 6px; cursor: pointer;
-    background: rgba(245,158,11,0.08); color: var(--amber);
-    border: 1px solid rgba(245,158,11,0.25); transition: all 0.2s; white-space: nowrap;
-  }
-  .add-btn:hover { background: rgba(245,158,11,0.15); }
+  /* BUTTONS */
+  .btn-teal { background:var(--teal); color:#0a0d11; border:none; padding:12px 28px; border-radius:4px; font-family:var(--ui); font-weight:600; font-size:15px; cursor:pointer; transition:all 0.2s; }
+  .btn-teal:hover:not(:disabled) { background:var(--teal-dim); transform:translateY(-1px); }
+  .btn-teal:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); padding:12px 22px; border-radius:4px; font-family:var(--ui); font-size:14px; cursor:pointer; transition:all 0.2s; }
+  .btn-ghost:hover { color:var(--text); border-color:var(--muted); }
+  .btn-hero { background:var(--teal); color:#0a0d11; border:none; padding:18px 42px; border-radius:4px; font-family:var(--display); font-size:22px; letter-spacing:0.1em; cursor:pointer; transition:all 0.2s; }
+  .btn-hero:hover { background:var(--teal-dim); transform:translateY(-2px); box-shadow:0 12px 32px rgba(29,209,161,0.2); }
+  .btn-hero-ghost { background:transparent; color:var(--text); border:1px solid var(--border2); padding:18px 42px; border-radius:4px; font-family:var(--ui); font-size:16px; cursor:pointer; transition:all 0.2s; }
+  .btn-hero-ghost:hover { border-color:var(--muted); }
 
-  /* ── THUMBS ── */
-  .thumb-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-  .thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid var(--border2); }
-  .thumb img { width: 88px; height: 64px; object-fit: cover; display: block; }
-  .thumb-num { position: absolute; bottom: 3px; left: 4px; font-family: var(--mono); font-size: 9px; color: rgba(255,255,255,0.7); background: rgba(0,0,0,0.6); padding: 1px 5px; border-radius: 3px; }
-  .thumb-del { position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: #ccc; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-  .thumb-del:hover { background: var(--red); color: #fff; }
+  /* LANDING */
+  .hero { max-width:900px; margin:0 auto; padding:100px 40px 80px; text-align:center; background-image:radial-gradient(ellipse 60% 50% at 50% -5%,rgba(29,209,161,0.08) 0%,transparent 70%); }
+  .hero-badge { display:inline-block; background:var(--gold-glow); color:var(--gold); border:1px solid rgba(243,156,18,0.25); padding:6px 16px; border-radius:20px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:28px; }
+  .hero h1 { font-family:var(--display); font-size:clamp(48px,8vw,80px); letter-spacing:0.06em; line-height:1; margin-bottom:24px; }
+  .hero h1 em { font-style:normal; color:var(--teal); }
+  .hero p { font-size:18px; color:var(--muted); line-height:1.7; max-width:560px; margin:0 auto 40px; font-weight:400; }
+  .hero-cta { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .section { max-width:900px; margin:0 auto; padding:80px 40px; }
+  .section-label { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--teal); margin-bottom:12px; }
+  .section h2 { font-family:var(--display); font-size:clamp(32px,5vw,52px); letter-spacing:0.06em; margin-bottom:48px; }
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:24px; }
+  .step-card { padding:28px; background:var(--surface); border:1px solid var(--border); border-radius:6px; transition:border-color 0.2s; }
+  .step-card:hover { border-color:rgba(29,209,161,0.2); }
+  .step-n { font-family:var(--display); font-size:48px; color:var(--border2); line-height:1; margin-bottom:14px; }
+  .step-card h3 { font-size:16px; font-weight:600; margin-bottom:8px; }
+  .step-card p { font-size:14px; color:var(--muted); line-height:1.6; font-weight:400; }
+  .why { background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+  .why-inner { max-width:900px; margin:0 auto; padding:80px 40px; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+  .why-stat { font-family:var(--display); font-size:80px; color:var(--gold); line-height:1; margin-bottom:12px; }
+  .why-inner p { font-size:15px; color:var(--muted); line-height:1.7; }
+  .why-points { list-style:none; }
+  .why-points li { padding:14px 0; border-bottom:1px solid var(--border); font-size:15px; color:var(--muted); display:flex; gap:12px; align-items:flex-start; line-height:1.5; }
+  .why-points li::before { content:"→"; color:var(--teal); flex-shrink:0; }
 
-  /* ── TERMINAL ── */
-  .terminal { background: #050709; border: 1px solid #0F1820; border-radius: 8px; padding: 14px 16px; margin-top: 14px; font-family: var(--mono); font-size: 12px; max-height: 160px; overflow-y: auto; line-height: 1.8; }
-  .log-line { color: #4ADE80; display: block; }
-  .log-line::before { content: '> '; color: var(--amber); }
-  .log-line.dim  { color: #1E4A30; }
-  .log-line.warn { color: var(--amber); }
-  .log-line.err  { color: var(--red); }
-  .cursor { display: inline-block; width: 8px; height: 13px; background: #4ADE80; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 4px; }
-  @keyframes blink { 50% { opacity: 0; } }
+  /* OVERLAY / SIGNUP */
+  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+  .overlay.active { display:flex; }
+  .signup-card { background:var(--surface); border:1px solid var(--border2); border-radius:8px; padding:48px 40px; max-width:480px; width:100%; margin:auto; }
+  .signup-icon { font-size:36px; margin-bottom:16px; }
+  .signup-card h2 { font-family:var(--display); font-size:32px; letter-spacing:0.06em; margin-bottom:8px; }
+  .signup-card > p { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:28px; }
+  .signup-legal { font-size:12px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.6; }
+  .signup-legal a { color:var(--teal); text-decoration:none; }
 
-  .err-box { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 12px 16px; color: #FCA5A5; font-size: 14px; margin-top: 12px; font-family: var(--mono); }
+  /* FIELDS */
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:6px; }
+  .field input,.field textarea,.field select { width:100%; background:var(--bg); border:1px solid var(--border2); border-radius:4px; padding:12px 16px; color:var(--text); font-family:var(--ui); font-size:15px; transition:border-color 0.2s; appearance:none; }
+  .field input:focus,.field textarea:focus,.field select:focus { outline:none; border-color:var(--teal); }
+  .field textarea { resize:vertical; min-height:80px; line-height:1.5; }
+  .field select option { background:var(--surface); }
+  .field.full { grid-column:1/-1; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 
-  /* ── BUTTONS ── */
-  .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-family: var(--display); font-size: 20px; letter-spacing: 0.12em; cursor: pointer; margin-top: 16px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-  .btn-primary { background: linear-gradient(135deg, var(--orange), var(--amber)); color: #000; }
-  .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(234,88,12,0.25); }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
-  .btn-ghost { background: rgba(245,158,11,0.08); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); font-size: 16px; }
-  .btn-ghost:hover { background: rgba(245,158,11,0.14); }
-  .spin { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2); border-top-color: #000; border-radius: 50%; animation: spin 0.7s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  /* WIZARD */
+  .wizard { display:none; position:fixed; inset:0; background:var(--bg); z-index:200; overflow-y:auto; }
+  .wizard.active { display:block; }
+  .wizard-nav-bar { display:flex; align-items:center; justify-content:space-between; padding:18px 40px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg); z-index:10; }
+  .progress-track { height:2px; background:var(--border); }
+  .progress-fill { height:100%; background:var(--teal); transition:width 0.4s ease; }
+  .wizard-body { max-width:640px; margin:0 auto; padding:60px 40px; }
+  .step-indicator { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:12px; }
+  .wizard-body h2 { font-family:var(--display); font-size:36px; letter-spacing:0.06em; margin-bottom:8px; }
+  .wizard-body > p { font-size:15px; color:var(--muted); line-height:1.6; margin-bottom:36px; }
+  .wizard-footer { display:flex; gap:12px; margin-top:40px; }
 
-  /* ── ELD TABLE ── */
-  .data-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
-  .data-table th { text-align: left; padding: 8px 12px; color: var(--muted); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 400; }
-  .data-table td { padding: 10px 12px; border-bottom: 1px solid rgba(28,37,48,0.5); color: #B0C4D8; }
-  .data-table tr:last-child td { border-bottom: none; }
-  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; }
-  .tag-drive { background: rgba(234,88,12,0.12);  color: #FB923C;      border: 1px solid rgba(234,88,12,0.2); }
-  .tag-duty  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
-  .tag-off   { background: rgba(90,112,144,0.1);  color: var(--muted); border: 1px solid rgba(90,112,144,0.15); }
-  .tag-sleep { background: rgba(99,102,241,0.1);  color: #A5B4FC;      border: 1px solid rgba(99,102,241,0.2); }
-  .totals-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-top: 14px; }
-  .tc { background: var(--surface2); padding: 14px 16px; text-align: center; }
-  .tc-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 4px; }
-  .tc-val   { font-family: var(--display); font-size: 26px; letter-spacing: 0.04em; color: var(--amber); }
-  .tc.hi .tc-val { color: var(--text); font-size: 30px; }
-  .note-box { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 8px; padding: 12px 16px; font-family: var(--mono); font-size: 12px; color: #D97706; margin-top: 12px; line-height: 1.6; }
+  /* UPLOAD */
+  .upload-zone { border:2px dashed var(--border2); border-radius:6px; padding:40px 24px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; margin-bottom:16px; }
+  .upload-zone:hover { border-color:var(--teal); background:var(--teal-glow); }
+  .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+  .upload-zone h3 { font-family:var(--display); font-size:22px; letter-spacing:0.06em; margin-bottom:6px; }
+  .upload-zone p { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.06em; }
+  .upload-zone p span { color:var(--teal); }
 
-  /* ── FORM ── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  @media (max-width: 520px) { .form-grid { grid-template-columns: 1fr; } }
-  .field label { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
-  .field input, .field select { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 6px; padding: 11px 14px; color: var(--text); font-family: var(--mono); font-size: 14px; transition: border-color 0.2s; appearance: none; }
-  .field input:focus, .field select:focus { outline: none; border-color: var(--amber); }
-  .field select option { background: #0E1318; }
-  .field.full { grid-column: 1/-1; }
+  /* BATCH */
+  .batch-counter { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:14px 18px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .batch-info { display:flex; flex-direction:column; gap:8px; }
+  .batch-text { font-family:var(--mono); font-size:11px; color:var(--muted); letter-spacing:0.08em; }
+  .batch-text.on { color:var(--teal); }
+  .batch-pips { display:flex; gap:10px; }
+  .pip-group { display:flex; flex-direction:column; gap:3px; }
+  .pip-group-label { font-family:var(--mono); font-size:8px; color:var(--muted); letter-spacing:0.1em; }
+  .pip-group-label.done { color:var(--teal); }
+  .pip-group-label.cur { color:var(--gold); }
+  .pip-row { display:flex; gap:2px; }
+  .pip { width:8px; height:3px; border-radius:2px; background:var(--border2); }
+  .pip.on { background:var(--teal); }
+  .pip.on.warn { background:var(--gold); }
+  .add-more-btn { font-family:var(--mono); font-size:11px; letter-spacing:0.06em; text-transform:uppercase; padding:8px 14px; border-radius:4px; cursor:pointer; background:var(--teal-glow); color:var(--teal); border:1px solid rgba(29,209,161,0.25); transition:all 0.2s; white-space:nowrap; }
+  .add-more-btn:hover { background:rgba(29,209,161,0.16); }
+  .batch-group { margin-bottom:16px; }
+  .batch-label { font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px; padding:3px 8px; background:var(--surface2); border:1px solid var(--border); border-radius:3px; display:inline-block; }
+  .batch-label.cur { color:var(--gold); border-color:rgba(243,156,18,0.2); background:var(--gold-glow); }
+  .thumb-grid { display:flex; flex-wrap:wrap; gap:8px; }
+  .thumb { position:relative; border-radius:6px; overflow:hidden; border:1px solid var(--border2); }
+  .thumb img { width:80px; height:58px; object-fit:cover; display:block; }
+  .thumb-num { position:absolute; bottom:3px; left:4px; font-family:var(--mono); font-size:9px; color:rgba(255,255,255,0.7); background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:2px; }
+  .thumb-del { position:absolute; top:3px; right:3px; width:16px; height:16px; background:rgba(0,0,0,0.75); border:none; border-radius:50%; color:#ccc; font-size:9px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .thumb-del:hover { background:var(--red); color:#fff; }
 
-  /* ── RESULTS ── */
-  .results-wrap { background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 16px; animation: fadeUp 0.4s ease; }
+  /* TERMINAL */
+  .terminal { background:#040609; border:1px solid rgba(29,209,161,0.1); border-radius:6px; padding:14px 16px; margin-top:14px; font-family:var(--mono); font-size:12px; max-height:140px; overflow-y:auto; line-height:1.8; }
+  .log-line { color:var(--teal); display:block; }
+  .log-line::before { content:'> '; color:var(--gold); }
+  .log-line.dim { color:rgba(29,209,161,0.3); }
+  .log-line.warn { color:var(--gold); }
+  .log-line.err { color:var(--red); }
+  .cursor { display:inline-block; width:7px; height:12px; background:var(--teal); animation:blink 1s step-end infinite; vertical-align:middle; margin-left:4px; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  /* ELD PREVIEW */
+  .eld-preview { background:var(--surface); border:1px solid var(--border); border-radius:6px; overflow:hidden; margin-top:14px; margin-bottom:24px; }
+  .eld-preview-header { padding:10px 16px; background:var(--surface2); border-bottom:1px solid var(--border); font-family:var(--mono); font-size:10px; color:var(--teal); letter-spacing:0.1em; text-transform:uppercase; }
+  .totals-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); }
+  .tc { background:var(--surface2); padding:14px 16px; text-align:center; }
+  .tc-label { font-family:var(--mono); font-size:9px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; }
+  .tc-val { font-family:var(--display); font-size:24px; color:var(--teal); letter-spacing:0.04em; }
+  .tc.hi .tc-val { color:var(--gold); font-size:28px; }
+  .note-box { background:var(--gold-glow); border-top:1px solid rgba(243,156,18,0.15); padding:10px 16px; font-family:var(--mono); font-size:11px; color:var(--gold); line-height:1.6; }
+
+  /* LOADING */
+  .loading-center { text-align:center; padding:80px 40px; }
+  .spinner-teal { width:52px; height:52px; border:3px solid var(--border); border-top-color:var(--teal); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 28px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .loading-center h3 { font-family:var(--display); font-size:28px; letter-spacing:0.06em; margin-bottom:8px; }
+  .loading-center p { font-size:14px; color:var(--muted); line-height:1.6; }
+
+  /* RESULTS */
+  .results-wrap { max-width:700px; margin:0 auto; padding:60px 40px; animation:fadeUp 0.4s ease; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-  .results-header { padding: 18px 22px; background: var(--surface2); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-  .results-title { font-family: var(--display); font-size: 22px; letter-spacing: 0.08em; color: var(--text); }
-  .verdict { font-family: var(--mono); font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
-  .v-match { background: rgba(34,197,94,0.1);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
-  .v-under { background: rgba(239,68,68,0.1);   color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
-  .v-over  { background: rgba(245,158,11,0.1);  color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
-  .compare-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
-  @media (max-width: 520px) { .compare-grid { grid-template-columns: 1fr; } }
-  .cg-cell { padding: 22px; border-right: 1px solid var(--border); }
-  .cg-cell:last-child { border-right: none; }
-  .cg-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
-  .cg-val   { font-family: var(--display); font-size: 38px; letter-spacing: 0.04em; line-height: 1; color: var(--text); }
-  .cg-val.pos  { color: var(--green); }
-  .cg-val.neg  { color: var(--red); }
-  .cg-val.warn { color: var(--amber); }
-  .cg-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 5px; }
-  .pay-compare { display: grid; grid-template-columns: 1fr 1fr 1fr; border-bottom: 1px solid var(--border); }
-  @media (max-width: 520px) { .pay-compare { grid-template-columns: 1fr; } }
-  .pc-cell { padding: 18px 22px; border-right: 1px solid var(--border); }
-  .pc-cell:last-child { border-right: none; }
-  .pc-label { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 4px; }
-  .pc-val   { font-family: var(--display); font-size: 28px; letter-spacing: 0.04em; color: var(--text); }
-  .pc-val.pos { color: var(--green); }
-  .pc-val.neg { color: var(--red); }
-  .analysis { padding: 18px 22px; font-size: 15px; color: #8AA0BC; line-height: 1.7; border-bottom: 1px solid var(--border); }
-  .analysis strong { color: var(--text); }
-  .analysis .hi  { color: var(--amber); font-weight: 600; }
-  .analysis .bad { color: var(--red);   font-weight: 600; }
-  .analysis .good{ color: var(--green); font-weight: 600; }
-  .results-footer { padding: 12px 22px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-  .results-footer span { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.08em; }
-  .reset-btn { background: none; border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); font-family: var(--mono); font-size: 10px; padding: 4px 12px; cursor: pointer; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
-  .reset-btn:hover { border-color: var(--amber); color: var(--amber); }
+  .results-header h2 { font-family:var(--display); font-size:40px; letter-spacing:0.06em; margin-bottom:14px; }
+  .verdict-badge { display:inline-flex; align-items:center; gap:8px; padding:8px 20px; border-radius:20px; font-family:var(--mono); font-size:12px; font-weight:600; letter-spacing:0.08em; }
+  .v-clear { background:rgba(29,209,161,0.1); color:var(--teal); border:1px solid rgba(29,209,161,0.25); }
+  .v-flag  { background:rgba(231,76,60,0.1); color:var(--red); border:1px solid rgba(231,76,60,0.25); }
+  .v-over  { background:rgba(243,156,18,0.1); color:var(--gold); border:1px solid rgba(243,156,18,0.25); }
+  .owed-banner { border-radius:6px; padding:28px; text-align:center; margin:28px 0; }
+  .owed-banner.bad { background:linear-gradient(135deg,rgba(231,76,60,0.1),rgba(231,76,60,0.04)); border:1px solid rgba(231,76,60,0.25); }
+  .owed-banner.good { background:linear-gradient(135deg,rgba(29,209,161,0.1),rgba(29,209,161,0.04)); border:1px solid rgba(29,209,161,0.25); }
+  .owed-label { font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:10px; }
+  .owed-amount { font-family:var(--display); font-size:64px; line-height:1; letter-spacing:0.04em; }
+  .owed-amount.red { color:var(--red); }
+  .owed-amount.teal { color:var(--teal); }
+  .summary-box { background:var(--surface); border-left:3px solid var(--teal); border-radius:0 6px 6px 0; padding:18px 20px; font-size:15px; color:var(--muted); line-height:1.7; margin-bottom:24px; }
+  .summary-box strong { color:var(--text); }
+  .results-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px; }
+  .result-card { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:22px; }
+  .result-card h4 { font-family:var(--mono); font-size:10px; color:var(--muted); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:14px; }
+  .result-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .result-row:last-child { border-bottom:none; }
+  .result-row span:first-child { color:var(--muted); }
+  .result-row span:last-child { font-family:var(--mono); color:var(--text); }
+  .result-row.hi span:last-child { color:var(--teal); }
+  .result-row.bad span:last-child { color:var(--red); }
+  .result-row.warn span:last-child { color:var(--gold); }
+  .disclaimer { font-size:12px; color:var(--muted); line-height:1.7; padding:16px 20px; background:var(--surface); border:1px solid var(--border); border-radius:4px; margin-bottom:24px; }
+  .results-actions { display:flex; gap:12px; }
+
+  /* MISC */
+  .err-box { background:rgba(231,76,60,0.07); border:1px solid rgba(231,76,60,0.2); border-radius:4px; padding:12px 16px; color:#fca5a5; font-size:14px; margin-top:12px; }
+  .spin-sm { width:15px; height:15px; border:2px solid rgba(10,13,17,0.3); border-top-color:#0a0d11; border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; vertical-align:middle; margin-right:6px; }
+  footer { border-top:1px solid var(--border); padding:32px 40px; text-align:center; font-size:13px; color:var(--muted); }
+  footer span { color:var(--teal); }
+
+  @media (max-width:640px) {
+    .nav { padding:14px 20px; }
+    .hero { padding:60px 20px 40px; }
+    .section { padding:60px 20px; }
+    .why-inner { grid-template-columns:1fr; gap:40px; padding:60px 20px; }
+    .wizard-body { padding:40px 20px; }
+    .wizard-nav-bar { padding:14px 20px; }
+    .results-wrap { padding:40px 20px; }
+    .results-grid { grid-template-columns:1fr; }
+    .signup-card { padding:36px 24px; }
+    .form-grid { grid-template-columns:1fr; }
+    footer { padding:24px 20px; }
+  }
 `;
 
-const MAX = 20;
-
 function fh(n) { return typeof n === "number" ? n.toFixed(1) + "h" : "—"; }
-function fd(n) { return typeof n !== "number" ? "—" : (n >= 0 ? "+" : "") + "$" + Math.abs(n).toFixed(2); }
 
 function parseJSON(text) {
   try {
@@ -208,116 +217,142 @@ function parseJSON(text) {
   } catch { return null; }
 }
 
-// Read file as base64 data URL using FileReader
 function readFile(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result); // full data URL: "data:image/jpeg;base64,..."
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
   });
 }
 
+function getCookie(name) {
+  return document.cookie.split(';').some(c => c.trim().startsWith(name + '='));
+}
+function setCookie(name) {
+  const exp = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=1; expires=${exp}; path=/; SameSite=Lax`;
+}
+
 export default function App() {
-  const [images,    setImages]    = useState([]); // [{ file, dataUrl }]
-  const [logs,      setLogs]      = useState([]);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [error,     setError]     = useState("");
-  const [eldData,   setEldData]   = useState(null);
-  const [pay,       setPay]       = useState({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
-  const [comparing, setComparing] = useState(false);
-  const [result,    setResult]    = useState(null);
+  const [view,         setView]         = useState('landing');
+  const [showSignup,   setShowSignup]   = useState(false);
+  const [wizardStep,   setWizardStep]   = useState(1);
+  const [signup,       setSignup]       = useState({ name:'', email:'', phone:'', feedback:'' });
+  const [signupLoading,setSignupLoading]= useState(false);
+  const [signupError,  setSignupError]  = useState('');
+  const [selectedState,setSelectedState]= useState('');
+  const [images,       setImages]       = useState([]);
+  const [logs,         setLogs]         = useState([]);
+  const [analyzing,    setAnalyzing]    = useState(false);
+  const [eldData,      setEldData]      = useState(null);
+  const [error,        setError]        = useState('');
+  const [pay,          setPay]          = useState({ hours:'', type:'hourly', rate:'', gross:'', week:'' });
+  const [result,       setResult]       = useState(null);
+  const [comparing,    setComparing]    = useState(false);
 
-  const inputRef   = useRef();
-  const moreRef    = useRef();
-  const logRef     = useRef();
+  const inputRef = useRef();
+  const moreRef  = useRef();
+  const logRef   = useRef();
 
-  const addLog = (msg, type = "") => {
+  const atMax       = images.length >= MAX;
+  const nearMax     = images.length >= 20 && !atMax;
+  const batchNum    = Math.min(Math.floor(images.length / BATCH_SIZE) + (images.length % BATCH_SIZE === 0 && images.length > 0 ? 0 : 1), 3);
+  const slotsFilled = images.length % BATCH_SIZE;
+  const batchFull   = slotsFilled === 0 && images.length > 0;
+  const pipClass    = nearMax || atMax ? 'warn' : '';
+  const progress    = Math.round((wizardStep / 5) * 100);
+
+  const addLog = (msg, type = '') => {
     setLogs(p => [...p, { msg, type }]);
     setTimeout(() => { if (logRef.current) logRef.current.scrollTop = 9999; }, 50);
   };
 
   const handleFiles = async (fileList) => {
-    const valid = Array.from(fileList).filter(f => f.type.startsWith("image/"));
+    const valid = Array.from(fileList).filter(f => f.type.startsWith('image/'));
     if (!valid.length) return;
-    const slots = MAX - images.length;
-    const toAdd = valid.slice(0, slots);
-    const loaded = await Promise.all(
-      toAdd.map(async (file) => ({ file, dataUrl: await readFile(file) }))
-    );
-    setImages(prev => [...prev, ...loaded]);
+    const toAdd = valid.slice(0, MAX - images.length);
+    const loaded = await Promise.all(toAdd.map(async f => ({ file: f, dataUrl: await readFile(f) })));
+    setImages(p => [...p, ...loaded]);
   };
 
-  const removeImage = (i) => setImages(p => p.filter((_, idx) => idx !== i));
+  const removeImage = i => setImages(p => p.filter((_, idx) => idx !== i));
+
+  const openWizard = () => {
+    if (getCookie('ls_member')) {
+      setView('wizard'); setWizardStep(1);
+    } else {
+      setShowSignup(true);
+    }
+  };
+
+  const submitSignup = async () => {
+    const { name, email, phone, feedback } = signup;
+    setSignupError('');
+    if (!name.trim())                        { setSignupError('Please enter your first name.'); return; }
+    if (!email.trim() || !email.includes('@')){ setSignupError('Please enter a valid email.'); return; }
+    setSignupLoading(true);
+    try {
+      const resp = await fetch(BACKEND + '/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), feedback: feedback.trim() }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || 'Something went wrong.');
+      setCookie('ls_member');
+      setShowSignup(false);
+      setView('wizard'); setWizardStep(1);
+    } catch (e) {
+      setSignupError(e.message);
+    } finally {
+      setSignupLoading(false);
+    }
+  };
 
   const analyzeELD = async () => {
-    setAnalyzing(true);
-    setLogs([]);
-    setError("");
-    setEldData(null);
-    setResult(null);
+    setAnalyzing(true); setWizardStep(3);
+    setLogs([]); setError(''); setEldData(null);
     try {
-      addLog("Initializing ELD parser...");
-      addLog(`${images.length} screenshot(s) queued`, "dim");
-      addLog("Encoding images...", "dim");
-
-      // Build image blocks from data URLs (strip the prefix to get base64)
+      addLog('Initializing ELD parser...');
+      addLog(`${images.length} screenshot(s) — state: ${selectedState}`, 'dim');
+      addLog('Encoding images...', 'dim');
       const imageBlocks = images.map(({ file, dataUrl }) => ({
-        type: "image",
-        source: {
-          type: "base64",
-          media_type: file.type || "image/jpeg",
-          data: dataUrl.split(",")[1],
-        },
+        type: 'image',
+        source: { type: 'base64', media_type: file.type || 'image/jpeg', data: dataUrl.split(',')[1] },
       }));
-
-      addLog("Connecting to AI...");
-
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      addLog('Connecting to AI...');
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: 'claude-sonnet-4-20250514',
           max_tokens: 2000,
-          system: "You are an expert ELD data reader. Extract hours-of-service data from ELD screenshots. Treat multiple screenshots as one continuous log. Return ONLY valid JSON — no prose, no markdown fences.",
-          messages: [{
-            role: "user",
-            content: [
-              ...imageBlocks,
-              { type: "text", text: `Analyze ALL screenshots as one continuous log. Return ONLY this JSON:
-{
-  "weekOf": "date range or null",
-  "driver": "name or null",
-  "vehicle": "unit number or null",
-  "days": [{ "date": "MM/DD", "driving": 0.0, "onDutyNotDriving": 0.0, "offDuty": 0.0, "sleeperBerth": 0.0, "totalOnDuty": 0.0 }],
-  "weeklyTotals": { "driving": 0.0, "onDutyNotDriving": 0.0, "offDuty": 0.0, "sleeperBerth": 0.0, "totalOnDuty": 0.0 },
-  "violations": "description or null",
-  "confidence": "high | medium | low"
-}
-Rules: decimal hours (1h30m=1.5), totalOnDuty=driving+onDutyNotDriving, combine across all screenshots no duplicates, use 0.0 if not visible.` }
-            ],
-          }],
+          system: 'You are an expert ELD data reader. Extract hours-of-service data from ELD screenshots. Treat multiple screenshots as one continuous log. Return ONLY valid JSON — no prose, no markdown fences.',
+          messages: [{ role: 'user', content: [
+            ...imageBlocks,
+            { type: 'text', text: `Driver is in ${selectedState}. Analyze ALL screenshots as one continuous log. Return ONLY this JSON:\n{"weekOf":"date range or null","driver":"name or null","vehicle":"unit number or null","days":[{"date":"MM/DD","driving":0.0,"onDutyNotDriving":0.0,"offDuty":0.0,"sleeperBerth":0.0,"totalOnDuty":0.0}],"weeklyTotals":{"driving":0.0,"onDutyNotDriving":0.0,"offDuty":0.0,"sleeperBerth":0.0,"totalOnDuty":0.0},"violations":"description or null","confidence":"high|medium|low"}\nRules: decimal hours (1h30m=1.5), totalOnDuty=driving+onDutyNotDriving, combine all screenshots, use 0.0 if not visible.` }
+          ]}],
         }),
       });
-
       const data = await res.json();
       if (data.error) throw new Error(data.error.message);
-
-      addLog("Parsing response...");
-      const raw    = (data.content || []).map(c => c.text || "").join("\n");
+      addLog('Parsing response...');
+      const raw    = (data.content || []).map(c => c.text || '').join('\n');
       const parsed = parseJSON(raw);
-
       if (!parsed) {
-        addLog("Parse failed. Showing raw output.", "warn");
+        addLog('Parse failed — showing raw output.', 'warn');
         setEldData({ _raw: raw, weeklyTotals: { totalOnDuty: 0 }, days: [] });
       } else {
-        addLog(`✓ ${parsed.days?.length || 0} day(s) extracted. Confidence: ${parsed.confidence || "unknown"}`);
-        if (parsed.violations) addLog(`⚠ ${parsed.violations}`, "warn");
+        addLog(`✓ ${parsed.days?.length || 0} day(s) extracted. Confidence: ${parsed.confidence || 'unknown'}`);
+        if (parsed.violations) addLog(`⚠ ${parsed.violations}`, 'warn');
         setEldData(parsed);
       }
+      setWizardStep(4);
     } catch (e) {
-      addLog("Error: " + (e.message || "Unknown"), "err");
-      setError(e.message || "Failed to analyze screenshots.");
+      addLog('Error: ' + (e.message || 'Unknown'), 'err');
+      setError(e.message || 'Failed to analyze screenshots.');
+      setWizardStep(2);
     } finally {
       setAnalyzing(false);
     }
@@ -325,311 +360,420 @@ Rules: decimal hours (1h30m=1.5), totalOnDuty=driving+onDutyNotDriving, combine 
 
   const calcPay = () => {
     setComparing(true);
-    const eldHours  = eldData?.weeklyTotals?.totalOnDuty || 0;
-    const paidHours = parseFloat(pay.hours) || 0;
-    const rate      = parseFloat(pay.rate)  || 0;
-    const grossPay  = parseFloat(pay.gross) || 0;
-    const hoursDiff = paidHours - eldHours;
-    const expected  = pay.type === "hourly" && rate > 0 ? eldHours * rate : grossPay;
-    const payDiff   = grossPay - expected;
-    const verdict   = hoursDiff < -0.5 ? "UNDERPAID" : hoursDiff > 0.5 ? "OVERPAID" : "MATCH";
+    const eldHours   = eldData?.weeklyTotals?.totalOnDuty || 0;
+    const paidHours  = parseFloat(pay.hours) || 0;
+    const rate       = parseFloat(pay.rate)  || 0;
+    const grossPay   = parseFloat(pay.gross) || 0;
+    const hoursDiff  = paidHours - eldHours;
+    const expected   = pay.type === 'hourly' && rate > 0 ? eldHours * rate : grossPay;
+    const payDiff    = grossPay - expected;
+    const impliedRate= eldHours > 0 ? grossPay / eldHours : 0;
+    const verdict    = hoursDiff < -0.5 ? 'UNDERPAID' : hoursDiff > 0.5 ? 'OVERPAID' : 'MATCH';
+    const owed       = verdict === 'UNDERPAID' && rate > 0 ? Math.abs(payDiff) : 0;
     setTimeout(() => {
-      setResult({ eldHours, paidHours, hoursDiff, rate, grossPay, expected, payDiff, verdict, payType: pay.type });
-      setComparing(false);
-    }, 600);
+      setResult({ eldHours, paidHours, hoursDiff, rate, grossPay, expected, payDiff, verdict, payType: pay.type, owed, impliedRate, state: selectedState });
+      setComparing(false); setWizardStep(5);
+    }, 700);
   };
 
   const reset = () => {
-    setImages([]); setLogs([]); setEldData(null); setResult(null); setError("");
-    setPay({ hours: "", type: "hourly", rate: "", gross: "", week: "" });
+    setView('landing'); setWizardStep(1); setSelectedState('');
+    setImages([]); setLogs([]); setEldData(null); setResult(null); setError('');
+    setPay({ hours:'', type:'hourly', rate:'', gross:'', week:'' });
   };
-
-  const step1Done  = !!eldData;
-  const canAnalyze = images.length > 0 && !analyzing;
-  const canCompare = step1Done && pay.hours && pay.gross && !comparing;
-  const atMax      = images.length >= MAX;
-  const nearMax    = images.length >= 15 && !atMax;
-  const pipClass   = atMax ? "full" : nearMax ? "warn" : "";
 
   return (
     <>
       <style>{css}</style>
-      <div className="app">
 
-        {/* TOPBAR */}
-        <div className="topbar">
-          <div className="logo">
-            <div className="logo-mark">⚡</div>
-            <div className="logo-text">
-              <div className="name">LOADSMARTER</div>
-              <div className="tagline">ELD Pay Verification</div>
+      {/* ── LANDING ── */}
+      {view === 'landing' && (
+        <div>
+          <nav className="nav">
+            <div className="logo">LOAD<em>SMARTER</em></div>
+            <div className="nav-right">
+              <span className="pill-free">Free Tool</span>
+              <button className="btn-teal" onClick={openWizard}>Run Free Audit</button>
+            </div>
+          </nav>
+
+          <section className="hero">
+            <div className="hero-badge">Free Pay Audit · No Account Required</div>
+            <h1>ARE YOU BEING PAID<br /><em>WHAT YOU'RE OWED?</em></h1>
+            <p>Upload your ELD screenshots and enter your check details. Get an instant audit showing exactly what you earned vs. what you were paid — and the amount owed if there's a discrepancy.</p>
+            <div className="hero-cta">
+              <button className="btn-hero" onClick={openWizard}>Run My Free Audit</button>
+              <button className="btn-hero-ghost" onClick={() => document.getElementById('why').scrollIntoView({ behavior:'smooth' })}>Why This Matters</button>
+            </div>
+          </section>
+
+          <section className="section">
+            <div className="section-label">Process</div>
+            <h2>FOUR STEPS TO YOUR AUDIT</h2>
+            <div className="steps">
+              <div className="step-card"><div className="step-n">01</div><h3>Select Your State</h3><p>State wage laws vary. We factor in your specific state's minimum wage on top of the federal $7.25/hr floor.</p></div>
+              <div className="step-card"><div className="step-n">02</div><h3>Upload ELD Screenshots</h3><p>Take screenshots from your ELD app. Upload up to 30 across 3 batches of 10 — any ELD brand works.</p></div>
+              <div className="step-card"><div className="step-n">03</div><h3>Enter Your Check</h3><p>Enter your gross pay, hours on your check, and hourly rate. We compare it against your actual logged hours.</p></div>
+              <div className="step-card"><div className="step-n">04</div><h3>Get Your Results</h3><p>Instant audit. Exact hours, implied hourly rate, and total amount owed if anything is missing from your check.</p></div>
+            </div>
+          </section>
+
+          <div className="why" id="why">
+            <div className="why-inner">
+              <div>
+                <div className="why-stat">$3.7B</div>
+                <p style={{fontSize:18,fontWeight:600,color:'var(--text)',marginBottom:12}}>Stolen from workers every year through wage theft</p>
+                <p>Truck drivers are among the most targeted. Per-mile pay structures, excessive deductions, and off-clock work requirements hide the real hourly rate you're actually earning.</p>
+              </div>
+              <ul className="why-points">
+                <li>Per-mile pay that doesn't cover minimum wage when you factor in total hours</li>
+                <li>Illegal deductions for equipment, fuel, and "lease" agreements</li>
+                <li>Unpaid detention time, loading, and pre-trip inspections</li>
+                <li>Misclassification as "independent contractor" to avoid wage protections</li>
+              </ul>
             </div>
           </div>
-          <div className="topbar-right">
-            <span className="pill pill-free">Free Tool</span>
-            <span className="pill pill-powered">AI-Powered</span>
+
+          <section className="section" style={{textAlign:'center'}}>
+            <div className="section-label">Get Started</div>
+            <h2>KNOW YOUR NUMBERS</h2>
+            <p style={{color:'var(--muted)',maxWidth:480,margin:'0 auto 32px',fontSize:16,lineHeight:1.7}}>Free, private, and built by someone who's been in the seat. Your screenshots are processed in your browser and never stored on our servers.</p>
+            <button className="btn-hero" onClick={openWizard}>Run My Free Audit</button>
+          </section>
+
+          <footer>
+            © 2025 LoadSmarter. Not legal advice. Estimates only.<br />
+            <span>Your screenshots are processed in your browser and never stored on our servers.</span>
+          </footer>
+        </div>
+      )}
+
+      {/* ── SIGNUP MODAL ── */}
+      {showSignup && (
+        <div className="overlay active" onClick={e => { if (e.target === e.currentTarget) setShowSignup(false); }}>
+          <div className="signup-card">
+            <div className="signup-icon">🚛</div>
+            <h2>GET YOUR FREE AUDIT</h2>
+            <p>Tell us about yourself. We'll run a full audit of your ELD hours vs. your check — completely free.</p>
+            <div className="field">
+              <label>First Name</label>
+              <input type="text" placeholder="John" value={signup.name} autoFocus onChange={e => setSignup(p => ({...p, name: e.target.value}))} />
+            </div>
+            <div className="field">
+              <label>Email Address</label>
+              <input type="email" placeholder="you@example.com" value={signup.email} onChange={e => setSignup(p => ({...p, email: e.target.value}))} />
+            </div>
+            <div className="field">
+              <label>Phone <span style={{color:'var(--muted)',fontWeight:300}}>(optional)</span></label>
+              <input type="tel" placeholder="+1 (555) 000-0000" value={signup.phone} onChange={e => setSignup(p => ({...p, phone: e.target.value}))} />
+            </div>
+            <div className="field">
+              <label>Biggest frustration with how you get paid?</label>
+              <textarea placeholder="e.g. My miles never match what I actually drove..." value={signup.feedback} onChange={e => setSignup(p => ({...p, feedback: e.target.value}))} />
+            </div>
+            {signupError && <div className="err-box">{signupError}</div>}
+            <button className="btn-teal" style={{width:'100%',marginTop:8}} disabled={signupLoading} onClick={submitSignup}>
+              {signupLoading ? <><span className="spin-sm" />Saving…</> : 'Get My Free Audit →'}
+            </button>
+            <p className="signup-legal">By continuing you agree to our <a href="legal.html" target="_blank" rel="noreferrer">Terms &amp; Privacy Policy</a>.</p>
           </div>
         </div>
+      )}
 
-        <div className="main">
-          <div className="hero">
-            <div className="hero-title">DID YOU GET PAID RIGHT?</div>
-            <div className="hero-sub">Upload your ELD screenshots · Enter your check · Get the truth</div>
+      {/* ── WIZARD ── */}
+      {view === 'wizard' && (
+        <div className="wizard active">
+          <div className="wizard-nav-bar">
+            <div className="logo">LOAD<em style={{color:'var(--teal)'}}>SMARTER</em></div>
+            <button className="btn-ghost" onClick={reset}>✕ Exit</button>
           </div>
-          <div className="divider-line" />
+          <div className="progress-track">
+            <div className="progress-fill" style={{width:`${progress}%`}} />
+          </div>
 
-          {/* ── STEP 1 ── */}
-          <div className={`panel ${step1Done ? "done" : "active"}`}>
-            <div className="panel-header">
-              <div className="step-num">{step1Done ? "✓" : "1"}</div>
-              <div>
-                <div className="panel-title">UPLOAD ELD SCREENSHOTS</div>
-                <div className="panel-sub">Any ELD brand · Select up to 20 at once · Full pay period supported</div>
+          {/* Step 1 — State */}
+          {wizardStep === 1 && (
+            <div className="wizard-body">
+              <div className="step-indicator">Step 1 of 4</div>
+              <h2>WHAT STATE DO YOU DRIVE IN?</h2>
+              <p>We use this to check your pay against your state's minimum wage laws — not just the federal $7.25/hr floor.</p>
+              <div className="field">
+                <label>Your State</label>
+                <select value={selectedState} onChange={e => setSelectedState(e.target.value)}>
+                  <option value="">— Select your state —</option>
+                  {STATES.map(s => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="wizard-footer">
+                <button className="btn-teal" style={{flex:1}} disabled={!selectedState} onClick={() => setWizardStep(2)}>Continue →</button>
               </div>
             </div>
-            <div className="panel-body">
-              {!step1Done && (
-                <>
-                  {/* Main upload button */}
-                  {!atMax && (
-                    <div className="upload-btn" onClick={() => inputRef.current?.click()}>
-                      <input
-                        ref={inputRef}
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        style={{ display: "none" }}
-                        onChange={e => { handleFiles(e.target.files); e.target.value = ""; }}
-                      />
-                      <span className="upload-icon">📱</span>
-                      <div className="upload-title">
-                        {images.length === 0 ? "TAP TO SELECT SCREENSHOTS" : "TAP TO ADD MORE"}
-                      </div>
-                      <div className="upload-hint">
-                        {images.length === 0
-                          ? <><span>Hold Shift or Ctrl to select multiple files at once</span><br />PNG · JPG · WEBP · Up to 20 screenshots</>
-                          : <><span>{MAX - images.length} slot{MAX - images.length !== 1 ? "s" : ""} remaining</span> · tap to keep adding</>
-                        }
-                      </div>
+          )}
+
+          {/* Step 2 — Upload */}
+          {wizardStep === 2 && (
+            <div className="wizard-body">
+              <div className="step-indicator">Step 2 of 4</div>
+              <h2>UPLOAD YOUR ELD SCREENSHOTS</h2>
+              <p>Take screenshots from your ELD app showing your hours of service. Upload up to 30 across 3 batches of 10.</p>
+
+              {!atMax && (
+                <div className="upload-zone">
+                  <input ref={inputRef} type="file" accept="image/*" multiple onChange={e => { handleFiles(e.target.files); e.target.value = ''; }} />
+                  <div style={{fontSize:36,marginBottom:12}}>📱</div>
+                  <h3>
+                    {images.length === 0 ? 'SELECT SCREENSHOTS'
+                      : batchFull ? `ADD BATCH ${Math.min(batchNum + 1, 3)}`
+                      : `ADD TO BATCH ${batchNum}`}
+                  </h3>
+                  <p>
+                    {images.length === 0
+                      ? <><span>Hold Shift or Ctrl to select multiple</span> · PNG · JPG · WEBP</>
+                      : batchFull
+                        ? <><span>Batch {batchNum} complete</span> · {MAX - images.length} slots remaining</>
+                        : <><span>Batch {batchNum}: {slotsFilled}/{BATCH_SIZE}</span> · {MAX - images.length} slots remaining</>
+                    }
+                  </p>
+                </div>
+              )}
+
+              {images.length > 0 && (
+                <div className="batch-counter">
+                  <div className="batch-info">
+                    <div className={`batch-text${images.length > 0 ? ' on' : ''}`}>
+                      {images.length}/{MAX} LOADED
+                      {batchFull && !atMax && ` · BATCH ${batchNum} COMPLETE`}
+                      {!batchFull && ` · BATCH ${batchNum}: ${slotsFilled}/${BATCH_SIZE}`}
+                      {atMax && ' · ALL BATCHES LOADED'}
                     </div>
-                  )}
-
-                  {/* Counter + thumbnails */}
-                  {images.length > 0 && (
+                    <div className="batch-pips">
+                      {[0,1,2].map(b => {
+                        const bImgs = images.slice(b * BATCH_SIZE, (b+1) * BATCH_SIZE);
+                        if (bImgs.length === 0 && images.length < b * BATCH_SIZE) return null;
+                        const done = bImgs.length === BATCH_SIZE;
+                        const cur  = !done && bImgs.length > 0;
+                        return (
+                          <div key={b} className="pip-group">
+                            <div className={`pip-group-label ${done ? 'done' : cur ? 'cur' : ''}`}>B{b+1}</div>
+                            <div className="pip-row">
+                              {Array.from({length:BATCH_SIZE}).map((_,i) => (
+                                <div key={i} className={`pip${i < bImgs.length ? ` on ${pipClass}` : ''}`} />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {!atMax && (
                     <>
-                      <div className="counter-bar">
-                        <div className="counter-left">
-                          <div className={`counter-text ${pipClass}`}>
-                            {images.length} / {MAX} SCREENSHOTS LOADED
-                            {nearMax && " · ALMOST AT LIMIT"}
-                            {atMax   && " · LIMIT REACHED"}
-                          </div>
-                          <div className="pip-row">
-                            {Array.from({ length: MAX }).map((_, i) => (
-                              <div key={i} className={`pip ${i < images.length ? `on ${pipClass}` : ""}`} />
-                            ))}
-                          </div>
-                        </div>
-                        {!atMax && (
-                          <>
-                            <input
-                              ref={moreRef}
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              style={{ display: "none" }}
-                              onChange={e => { handleFiles(e.target.files); e.target.value = ""; }}
-                            />
-                            <button className="add-btn" onClick={() => moreRef.current?.click()}>
-                              ＋ Add More
-                            </button>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="thumb-grid">
-                        {images.map(({ dataUrl }, i) => (
-                          <div key={i} className="thumb">
-                            <img src={dataUrl} alt={`Screenshot ${i + 1}`} />
-                            <span className="thumb-num">#{i + 1}</span>
-                            <button className="thumb-del" onClick={() => removeImage(i)}>✕</button>
-                          </div>
-                        ))}
-                      </div>
+                      <input ref={moreRef} type="file" accept="image/*" multiple style={{display:'none'}} onChange={e => { handleFiles(e.target.files); e.target.value=''; }} />
+                      <button className="add-more-btn" onClick={() => moreRef.current?.click()}>
+                        {batchFull ? `＋ Batch ${batchNum+1}` : '＋ Add More'}
+                      </button>
                     </>
                   )}
+                </div>
+              )}
 
-                  {/* Log */}
-                  {logs.length > 0 && (
-                    <div className="terminal" ref={logRef}>
-                      {logs.map((l, i) => (
-                        <span key={i} className={`log-line ${l.type}`}>{l.msg}</span>
-                      ))}
-                      {analyzing && <span className="log-line"><span className="cursor" /></span>}
+              {[0,1,2].map(b => {
+                const bImgs = images.slice(b * BATCH_SIZE, (b+1) * BATCH_SIZE);
+                if (bImgs.length === 0) return null;
+                const done = bImgs.length === BATCH_SIZE;
+                return (
+                  <div key={b} className="batch-group">
+                    <div className={`batch-label${!done ? ' cur' : ''}`}>
+                      Batch {b+1} — {bImgs.length} screenshot{bImgs.length !== 1 ? 's' : ''}{done ? ' ✓' : ''}
                     </div>
-                  )}
+                    <div className="thumb-grid">
+                      {bImgs.map(({dataUrl}, i) => {
+                        const gi = b * BATCH_SIZE + i;
+                        return (
+                          <div key={gi} className="thumb">
+                            <img src={dataUrl} alt="" />
+                            <span className="thumb-num">#{gi+1}</span>
+                            <button className="thumb-del" onClick={() => removeImage(gi)}>✕</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
 
-                  {error && <div className="err-box">⚠ {error}</div>}
+              {error && <div className="err-box">⚠ {error}</div>}
 
-                  <button className="btn btn-primary" disabled={!canAnalyze} onClick={analyzeELD}>
-                    {analyzing
-                      ? <><div className="spin" />&nbsp;READING YOUR ELD...</>
-                      : `⚡ ANALYZE ${images.length > 0 ? `${images.length} SCREENSHOT${images.length > 1 ? "S" : ""}` : "ELD SCREENSHOTS"}`
-                    }
-                  </button>
-                </>
-              )}
-
-              {/* Extracted data */}
-              {step1Done && !eldData?._raw && (
-                <>
-                  {eldData?.days?.length > 0 && (
-                    <table className="data-table">
-                      <thead>
-                        <tr><th>Date</th><th>Driving</th><th>On Duty ND</th><th>Off Duty</th><th>Sleeper</th><th>Total On Duty</th></tr>
-                      </thead>
-                      <tbody>
-                        {eldData.days.map((d, i) => (
-                          <tr key={i}>
-                            <td style={{ color: "var(--text)", fontWeight: 600 }}>{d.date}</td>
-                            <td><span className="tag tag-drive">{fh(d.driving)}</span></td>
-                            <td><span className="tag tag-duty">{fh(d.onDutyNotDriving)}</span></td>
-                            <td><span className="tag tag-off">{fh(d.offDuty)}</span></td>
-                            <td><span className="tag tag-sleep">{fh(d.sleeperBerth)}</span></td>
-                            <td style={{ color: "var(--amber)", fontWeight: 600 }}>{fh(d.totalOnDuty)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                  <div className="totals-strip">
-                    {[
-                      ["Driving",      eldData?.weeklyTotals?.driving],
-                      ["On Duty (ND)", eldData?.weeklyTotals?.onDutyNotDriving],
-                      ["Off / Sleeper",(eldData?.weeklyTotals?.offDuty||0)+(eldData?.weeklyTotals?.sleeperBerth||0)],
-                      ["Total On Duty", eldData?.weeklyTotals?.totalOnDuty],
-                    ].map(([label, val], i) => (
-                      <div key={i} className={`tc${i === 3 ? " hi" : ""}`}>
-                        <div className="tc-label">{label}</div>
-                        <div className="tc-val" style={i === 2 ? { color: "var(--muted)" } : {}}>{fh(val)}</div>
-                      </div>
-                    ))}
-                  </div>
-                  {eldData?.violations && <div className="note-box">⚠ {eldData.violations}</div>}
-                  <button className="btn btn-ghost" style={{ marginTop: 14 }} onClick={reset}>↺ Start Over</button>
-                </>
-              )}
-
-              {step1Done && eldData?._raw && (
-                <>
-                  <div className="terminal" style={{ maxHeight: 240, color: "#CBD5E1" }}>
-                    <span className="log-line">Raw output (parse failed):</span>
-                    <span className="log-line dim">{eldData._raw}</span>
-                  </div>
-                  <button className="btn btn-ghost" style={{ marginTop: 14 }} onClick={reset}>↺ Try Again</button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* ── STEP 2 ── */}
-          {step1Done && !eldData?._raw && (
-            <div className={`panel ${result ? "done" : "active"}`}>
-              <div className="panel-header">
-                <div className="step-num">{result ? "✓" : "2"}</div>
-                <div>
-                  <div className="panel-title">ENTER PAYCHECK DETAILS</div>
-                  <div className="panel-sub">What your employer says they paid you</div>
-                </div>
-              </div>
-              <div className="panel-body">
-                <div className="form-grid">
-                  <div className="field">
-                    <label>Week Of</label>
-                    <input type="text" placeholder="e.g. 04/14 – 04/20" value={pay.week} onChange={e => setPay(p => ({ ...p, week: e.target.value }))} />
-                  </div>
-                  <div className="field">
-                    <label>Pay Structure</label>
-                    <select value={pay.type} onChange={e => setPay(p => ({ ...p, type: e.target.value }))}>
-                      <option value="hourly">Hourly Rate</option>
-                      <option value="permile">Per Mile</option>
-                      <option value="flat">Flat / Salary</option>
-                    </select>
-                  </div>
-                  <div className="field">
-                    <label>Hours on Paycheck</label>
-                    <input type="number" placeholder="e.g. 44.5" value={pay.hours} onChange={e => setPay(p => ({ ...p, hours: e.target.value }))} />
-                  </div>
-                  <div className="field">
-                    <label>{pay.type === "permile" ? "Rate per Mile ($)" : pay.type === "flat" ? "N/A" : "Hourly Rate ($)"}</label>
-                    <input type="number" placeholder={pay.type === "permile" ? "0.55" : pay.type === "flat" ? "—" : "18.50"} value={pay.rate} disabled={pay.type === "flat"} onChange={e => setPay(p => ({ ...p, rate: e.target.value }))} />
-                  </div>
-                  <div className="field full">
-                    <label>Gross Pay on Check ($)</label>
-                    <input type="number" placeholder="e.g. 920.00" value={pay.gross} onChange={e => setPay(p => ({ ...p, gross: e.target.value }))} />
-                  </div>
-                </div>
-                <button className="btn btn-primary" disabled={!canCompare} onClick={calcPay}>
-                  {comparing ? <><div className="spin" />&nbsp;CALCULATING...</> : "🔍 CALCULATE PAY DISCREPANCY"}
+              <div className="wizard-footer">
+                <button className="btn-ghost" onClick={() => setWizardStep(1)}>← Back</button>
+                <button className="btn-teal" style={{flex:1}} disabled={images.length === 0} onClick={analyzeELD}>
+                  ⚡ Analyze {images.length > 0 ? `${images.length} Screenshot${images.length !== 1 ? 's' : ''}` : 'Screenshots'}
                 </button>
               </div>
             </div>
           )}
 
-          {/* ── RESULTS ── */}
-          {result && (
-            <div className="results-wrap">
-              <div className="results-header">
-                <div className="results-title">PAY VERIFICATION REPORT</div>
-                <span className={`verdict ${result.verdict === "MATCH" ? "v-match" : result.verdict === "UNDERPAID" ? "v-under" : "v-over"}`}>
-                  {result.verdict === "MATCH"     && "✓ HOURS MATCH"}
-                  {result.verdict === "UNDERPAID" && "⚠ HOURS SHORT"}
-                  {result.verdict === "OVERPAID"  && "↑ HOURS OVER"}
-                </span>
+          {/* Step 3 — Analyzing */}
+          {wizardStep === 3 && (
+            <div className="wizard-body">
+              <div className="loading-center">
+                <div className="spinner-teal" />
+                <h3>READING YOUR ELD</h3>
+                <p>Analyzing {images.length} screenshot{images.length !== 1 ? 's' : ''} from {selectedState}.<br />This takes 15–30 seconds.</p>
               </div>
-              <div className="compare-grid">
-                <div className="cg-cell">
-                  <div className="cg-label">ELD On-Duty Hours</div>
-                  <div className="cg-val">{result.eldHours.toFixed(2)}h</div>
-                  <div className="cg-sub">From your screenshots</div>
-                </div>
-                <div className="cg-cell">
-                  <div className="cg-label">Paid Hours on Check</div>
-                  <div className="cg-val">{result.paidHours.toFixed(2)}h</div>
-                  <div className="cg-sub">As listed by employer</div>
-                </div>
-                <div className="cg-cell">
-                  <div className="cg-label">Hour Difference</div>
-                  <div className={`cg-val ${result.hoursDiff > 0.5 ? "pos" : result.hoursDiff < -0.5 ? "neg" : "warn"}`}>
-                    {result.hoursDiff >= 0 ? "+" : ""}{result.hoursDiff.toFixed(2)}h
-                  </div>
-                  <div className="cg-sub">{result.hoursDiff < -0.5 ? "Missing from check" : result.hoursDiff > 0.5 ? "Extra on check" : "Within tolerance"}</div>
-                </div>
-              </div>
-              {result.payType !== "flat" && result.rate > 0 && (
-                <div className="pay-compare">
-                  <div className="pc-cell"><div className="pc-label">Expected Pay</div><div className="pc-val">${result.expected.toFixed(2)}</div></div>
-                  <div className="pc-cell"><div className="pc-label">Actual Gross</div><div className="pc-val">${result.grossPay.toFixed(2)}</div></div>
-                  <div className="pc-cell">
-                    <div className="pc-label">Difference</div>
-                    <div className={`pc-val ${result.payDiff < -0.5 ? "neg" : result.payDiff > 0.5 ? "pos" : ""}`}>{fd(result.payDiff)}</div>
-                  </div>
+              {logs.length > 0 && (
+                <div className="terminal" ref={logRef}>
+                  {logs.map((l,i) => <span key={i} className={`log-line ${l.type}`}>{l.msg}</span>)}
+                  {analyzing && <span className="log-line"><span className="cursor" /></span>}
                 </div>
               )}
-              <div className="analysis">
-                {result.verdict === "MATCH"     && <>Your ELD hours and paycheck hours are <span className="good">within acceptable tolerance</span>. <strong>No discrepancy detected.</strong></>}
-                {result.verdict === "UNDERPAID" && <>Your ELD shows <strong>{result.eldHours.toFixed(2)} hours</strong> on duty but your check only shows <strong>{result.paidHours.toFixed(2)} hours</strong> — a <span className="bad">gap of {Math.abs(result.hoursDiff).toFixed(2)} hours</span>.{result.payType !== "flat" && result.rate > 0 && <> At ${result.rate}/hr that's approximately <span className="bad">${Math.abs(result.payDiff).toFixed(2)} missing.</span></>} Keep your ELD records and bring this to your dispatcher or payroll.</>}
-                {result.verdict === "OVERPAID"  && <>Your check shows <strong>{result.paidHours.toFixed(2)} hours</strong> but your ELD recorded <strong>{result.eldHours.toFixed(2)} hours</strong> — <span className="hi">{Math.abs(result.hoursDiff).toFixed(2)} extra hours on your check</span>. Could be a bonus or an error — worth confirming.</>}
+            </div>
+          )}
+
+          {/* Step 4 — Paycheck */}
+          {wizardStep === 4 && eldData && !eldData._raw && (
+            <div className="wizard-body">
+              <div className="step-indicator">Step 3 of 4</div>
+              <h2>ENTER YOUR PAYCHECK</h2>
+              <p>ELD data extracted for {selectedState}. Now enter what your employer says they paid you.</p>
+
+              <div className="eld-preview">
+                <div className="eld-preview-header">✓ ELD Data Extracted — {eldData.weekOf || selectedState}</div>
+                <div className="totals-strip">
+                  {[
+                    ['Driving',      eldData.weeklyTotals?.driving],
+                    ['On Duty ND',   eldData.weeklyTotals?.onDutyNotDriving],
+                    ['Off / Sleep',  (eldData.weeklyTotals?.offDuty||0)+(eldData.weeklyTotals?.sleeperBerth||0)],
+                    ['Total On Duty',eldData.weeklyTotals?.totalOnDuty],
+                  ].map(([label,val],i) => (
+                    <div key={i} className={`tc${i===3?' hi':''}`}>
+                      <div className="tc-label">{label}</div>
+                      <div className="tc-val">{fh(val)}</div>
+                    </div>
+                  ))}
+                </div>
+                {eldData.violations && <div className="note-box">⚠ {eldData.violations}</div>}
               </div>
-              <div className="results-footer">
-                <span>Generated {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" })} · LoadSmarter ELD Checker</span>
-                <button className="reset-btn" onClick={reset}>Run Another Check</button>
+
+              <div className="form-grid">
+                <div className="field">
+                  <label>Week Of</label>
+                  <input type="text" placeholder="e.g. 04/14 – 04/20" value={pay.week} onChange={e => setPay(p=>({...p,week:e.target.value}))} />
+                </div>
+                <div className="field">
+                  <label>Pay Structure</label>
+                  <select value={pay.type} onChange={e => setPay(p=>({...p,type:e.target.value}))}>
+                    <option value="hourly">Hourly Rate</option>
+                    <option value="permile">Per Mile</option>
+                    <option value="flat">Flat / Salary</option>
+                  </select>
+                </div>
+                <div className="field">
+                  <label>Hours on Paycheck</label>
+                  <input type="number" placeholder="e.g. 44.5" value={pay.hours} onChange={e => setPay(p=>({...p,hours:e.target.value}))} />
+                </div>
+                <div className="field">
+                  <label>{pay.type==='permile' ? 'Rate per Mile ($)' : pay.type==='flat' ? 'N/A' : 'Hourly Rate ($)'}</label>
+                  <input type="number" placeholder={pay.type==='permile'?'0.55':pay.type==='flat'?'—':'18.50'} value={pay.rate} disabled={pay.type==='flat'} onChange={e => setPay(p=>({...p,rate:e.target.value}))} />
+                </div>
+                <div className="field full">
+                  <label>Gross Pay on Check ($)</label>
+                  <input type="number" placeholder="e.g. 920.00" value={pay.gross} onChange={e => setPay(p=>({...p,gross:e.target.value}))} />
+                </div>
+              </div>
+
+              <div className="wizard-footer">
+                <button className="btn-ghost" onClick={() => setWizardStep(2)}>← Back</button>
+                <button className="btn-teal" style={{flex:1}} disabled={!pay.hours || !pay.gross || comparing} onClick={calcPay}>
+                  {comparing ? <><span className="spin-sm" />Calculating…</> : '🔍 Calculate Discrepancy'}
+                </button>
               </div>
             </div>
           )}
 
+          {/* Step 4 — Parse failed */}
+          {wizardStep === 4 && eldData?._raw && (
+            <div className="wizard-body">
+              <h2>PARSE FAILED</h2>
+              <p>Couldn't extract structured data. Try again with clearer, brighter screenshots.</p>
+              <div className="terminal" style={{maxHeight:200,color:'#cbd5e1'}}>
+                <span className="log-line">Raw output:</span>
+                <span className="log-line dim">{eldData._raw}</span>
+              </div>
+              <div className="wizard-footer">
+                <button className="btn-ghost" onClick={() => { setEldData(null); setWizardStep(2); }}>← Try Again</button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 5 — Results */}
+          {wizardStep === 5 && result && (
+            <div className="results-wrap">
+              <div className="results-header">
+                <h2>YOUR PAY AUDIT</h2>
+                <span className={`verdict-badge ${result.verdict==='MATCH'?'v-clear':result.verdict==='UNDERPAID'?'v-flag':'v-over'}`}>
+                  {result.verdict==='MATCH'     && '✓ Hours Match'}
+                  {result.verdict==='UNDERPAID' && '⚠ Potential Underpayment'}
+                  {result.verdict==='OVERPAID'  && '↑ Hours Over on Check'}
+                </span>
+              </div>
+
+              <div className={`owed-banner ${result.verdict==='UNDERPAID'?'bad':'good'}`}>
+                <div className="owed-label">Estimated Amount Owed</div>
+                <div className={`owed-amount ${result.verdict==='UNDERPAID'?'red':'teal'}`}>
+                  {result.verdict==='UNDERPAID' && result.owed > 0
+                    ? `$${result.owed.toFixed(2)}`
+                    : result.verdict==='MATCH'
+                      ? "You're paid up"
+                      : 'Extra on check'
+                  }
+                </div>
+              </div>
+
+              <div className="summary-box">
+                {result.verdict==='MATCH'     && <>Your ELD hours and paycheck hours are <strong>within acceptable tolerance</strong> for {result.state}. No discrepancy detected.</>}
+                {result.verdict==='UNDERPAID' && <>Your ELD shows <strong>{result.eldHours.toFixed(2)} hours</strong> on duty but your check only reflects <strong>{result.paidHours.toFixed(2)} hours</strong> — a gap of <strong>{Math.abs(result.hoursDiff).toFixed(2)} hours</strong>.{result.payType!=='flat'&&result.rate>0&&<> At ${result.rate}/hr, that's approximately <strong>${Math.abs(result.payDiff).toFixed(2)} missing</strong>.</>} Keep your ELD records and bring this to your dispatcher or payroll.</>}
+                {result.verdict==='OVERPAID'  && <>Your check shows <strong>{result.paidHours.toFixed(2)} hours</strong> but your ELD recorded <strong>{result.eldHours.toFixed(2)} hours</strong> — {Math.abs(result.hoursDiff).toFixed(2)} extra hours on your check. Could be a bonus, OT, or an error — worth confirming with payroll.</>}
+              </div>
+
+              <div className="results-grid">
+                <div className="result-card">
+                  <h4>ELD Hours — {result.state}</h4>
+                  <div className="result-row hi"><span>Total On Duty</span><span>{result.eldHours.toFixed(2)} hrs</span></div>
+                  <div className="result-row"><span>Hours on Check</span><span>{result.paidHours.toFixed(2)} hrs</span></div>
+                  <div className={`result-row ${result.verdict==='MATCH'?'hi':result.verdict==='UNDERPAID'?'bad':'warn'}`}>
+                    <span>Difference</span>
+                    <span>{result.hoursDiff>=0?'+':''}{result.hoursDiff.toFixed(2)} hrs</span>
+                  </div>
+                </div>
+                <div className="result-card">
+                  <h4>Pay Analysis</h4>
+                  <div className="result-row"><span>Gross Pay</span><span>${result.grossPay.toFixed(2)}</span></div>
+                  {result.payType!=='flat'&&result.rate>0&&<div className="result-row"><span>Stated Rate</span><span>${result.rate}/hr</span></div>}
+                  <div className={`result-row ${result.impliedRate < 7.25 ? 'bad' : 'hi'}`}>
+                    <span>Implied Hourly Rate</span><span>${result.impliedRate.toFixed(2)}/hr</span>
+                  </div>
+                  <div className={`result-row ${result.impliedRate < 7.25 ? 'bad' : ''}`}>
+                    <span>Federal Min Wage</span><span>$7.25/hr</span>
+                  </div>
+                  {result.payType!=='flat'&&result.rate>0&&(
+                    <div className={`result-row ${result.verdict==='UNDERPAID'?'bad':result.verdict==='MATCH'?'hi':''}`}>
+                      <span>Expected Pay</span><span>${result.expected.toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="disclaimer">
+                <strong>Disclaimer:</strong> This audit is an estimate for informational purposes only and does not constitute legal advice. Calculations are based on the information you provided and may not capture all factors affecting your pay. Consult a licensed employment attorney or your state's Department of Labor for official guidance on wage claims.
+              </div>
+
+              <div className="results-actions">
+                <button className="btn-ghost" onClick={reset}>← Run Another Audit</button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </>
   );
 }
